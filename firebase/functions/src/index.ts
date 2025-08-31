@@ -18,7 +18,7 @@ export const spinWheel = functions.https.onCall(async (data: any, context: any) 
     const clientRequestId = data?.clientRequestId || null;
 
     // Check cooldown period (5 minutes)
-    const cooldownMinutes = 5;
+    const cooldownMinutes = 1;
     const lastSpinQuery = await db.collection('spins')
       .where('userId', '==', userId)
       .orderBy('timestamp', 'desc')

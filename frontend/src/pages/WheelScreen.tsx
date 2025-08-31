@@ -122,16 +122,18 @@ export const WheelScreen: React.FC = () => {
         clientRequestId: `spin_${Date.now()}`,
         userId: user?.uid, // For emulator testing
       });
-      
+
 
       const data = result.data as any;
-      
+
+      // console.log('🔍 Data after spin:', data);
       if (data.success) {
         setWinningSegment(data.segment);
         setLastSpinResult(data);
         
         // Calculate next allowed time
         const nextTime = new Date();
+        console.log('🔍 Next time:', data.cooldownMinutes);
         nextTime.setMinutes(nextTime.getMinutes() + data.cooldownMinutes);
         setNextAllowedAt(nextTime);
         
