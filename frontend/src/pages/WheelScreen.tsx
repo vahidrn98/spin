@@ -63,65 +63,66 @@ export const WheelScreen: React.FC = () => {
 
     try {
       // Mock spin functionality for now
-      console.log('🎭 Using mock spin functionality');
+      // console.log('🎭 Using mock spin functionality');
       
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // // Simulate network delay
+      // await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Randomly select a winning segment based on weights
-      const totalWeight = wheelConfig.totalWeight;
-      let randomValue = Math.random() * totalWeight;
-      let winningSegment = wheelConfig.segments[0];
+      // // Randomly select a winning segment based on weights
+      // const totalWeight = wheelConfig.totalWeight;
+      // let randomValue = Math.random() * totalWeight;
+      // let winningSegment = wheelConfig.segments[0];
       
-      for (const segment of wheelConfig.segments) {
-        randomValue -= segment.weight;
-        if (randomValue <= 0) {
-          winningSegment = segment;
-          break;
-        }
-      }
+      // for (const segment of wheelConfig.segments) {
+      //   randomValue -= segment.weight;
+      //   if (randomValue <= 0) {
+      //     winningSegment = segment;
+      //     break;
+      //   }
+      // }
       
-      console.log('🎯 Selected winning segment:', {
-        id: winningSegment.id,
-        label: winningSegment.label,
-        index: wheelConfig.segments.findIndex(s => s.id === winningSegment.id)
-      });
+      // console.log('🎯 Selected winning segment:', {
+      //   id: winningSegment.id,
+      //   label: winningSegment.label,
+      //   index: wheelConfig.segments.findIndex(s => s.id === winningSegment.id)
+      // });
       
-      // Create mock result
-      const mockResult = {
-        success: true,
-        segment: winningSegment,
-        message: `Congratulations! You won: ${winningSegment.prize.description}`,
-        cooldownMinutes: wheelConfig.cooldownMinutes,
-        timestamp: new Date().toISOString()
-      };
+      // // Create mock result
+      // const mockResult = {
+      //   success: true,
+      //   segment: winningSegment,
+      //   message: `Congratulations! You won: ${winningSegment.prize.description}`,
+      //   cooldownMinutes: wheelConfig.cooldownMinutes,
+      //   timestamp: new Date().toISOString()
+      // };
       
-      console.log('🎰 Mock spin result:', mockResult);
+      // console.log('🎰 Mock spin result:', mockResult);
       
-      setWinningSegment(winningSegment);
-      // lastSpinResult will be set after the reward popup is closed
+      // setWinningSegment(winningSegment);
+      // // lastSpinResult will be set after the reward popup is closed
       
-      // Calculate next allowed time
-      const nextTime = new Date();
-      nextTime.setMinutes(nextTime.getMinutes() + mockResult.cooldownMinutes);
-      setNextAllowedAt(nextTime);
+      // // Calculate next allowed time
+      // const nextTime = new Date();
+      // nextTime.setMinutes(nextTime.getMinutes() + mockResult.cooldownMinutes);
+      // setNextAllowedAt(nextTime);
       
-      // Trigger wheel animation
-      if (wheelRef.current) {
-        console.log('🎲 Spinning wheel to segment ID:', winningSegment.id);
-        wheelRef.current.spinWheel(winningSegment.id);
-      }
+      // // Trigger wheel animation
+      // if (wheelRef.current) {
+      //   console.log('🎲 Spinning wheel to segment ID:', winningSegment.id);
+      //   wheelRef.current.spinWheel(winningSegment.id);
+      // }
       
       // Firebase code (commented out for now)
-      /*
-      // Call Firebase Function
-      const { getFunctions, httpsCallable } = await import('@react-native-firebase/functions');
-      const functions = getFunctions();
-      const spinWheel = httpsCallable(functions, 'spinWheel');
+      
+             // Call Firebase Function
+       const spinWheel = functions().httpsCallable('spinWheel');
+      console.log('🔍 Spin wheel function called');
 
       const result = await spinWheel({
         clientRequestId: `spin_${Date.now()}`,
+        userId: user?.uid, // For emulator testing
       });
+      
 
       const data = result.data as any;
       
@@ -141,7 +142,7 @@ export const WheelScreen: React.FC = () => {
       } else {
         Alert.alert('Error', 'Failed to process spin. Please try again.');
       }
-      */
+      
       
     } catch (error: any) {
       console.error('Spin error:', error);

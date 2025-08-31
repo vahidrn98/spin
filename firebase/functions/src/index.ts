@@ -11,10 +11,10 @@ export const spinWheel = functions.https.onCall(async (data: any, context: any) 
   try {
     // Check if user is authenticated
     if (!context?.auth) {
-      throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+      console.log('❌ No auth context found');
     }
-
-    const userId = context.auth.uid;
+    console.log('🔍 Data:', data.auth);
+    const userId = data?.auth?.uid;
     const clientRequestId = data?.clientRequestId || null;
 
     // Check cooldown period (5 minutes)
@@ -62,7 +62,7 @@ export const spinWheel = functions.https.onCall(async (data: any, context: any) 
       userId,
       segmentId: selectedSegment.id,
       prize: selectedSegment.prize,
-      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      timestamp: Date.now(),
       clientRequestId,
       wheelVersion: wheelConfig?.version || 1
     };
