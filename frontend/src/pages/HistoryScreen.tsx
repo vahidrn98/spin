@@ -24,50 +24,13 @@ interface SpinHistory {
   label: string;
 }
 
-// Mock history data for development fallback
-const generateMockHistory = (count: number): SpinHistory[] => {
-  const mockPrizes = [
-    { type: 'coins', amount: 100, description: '100 Coins!' },
-    { type: 'coins', amount: 50, description: '50 Coins!' },
-    { type: 'special', amount: 1, description: 'Diamond Reward!' },
-    { type: 'coins', amount: 25, description: '25 Coins!' },
-    { type: 'bonus', amount: 2, description: '2x Multiplier!' },
-    { type: 'coins', amount: 10, description: '10 Coins!' },
-    { type: 'coins', amount: 75, description: '75 Coins!' },
-    { type: 'jackpot', amount: 1000, description: 'JACKPOT! 1000 Coins!' },
-  ];
-
-  const mockLabels = [
-    '🎁 Prize A', '🏆 Prize B', '💎 Rare Prize', '🎯 Prize C',
-    '⭐ Bonus', '🎈 Prize D', '🎊 Prize E', '🔥 Jackpot'
-  ];
-
-  const history: SpinHistory[] = [];
-  const now = new Date();
-
-  for (let i = 0; i < count; i++) {
-    const randomPrize = mockPrizes[Math.floor(Math.random() * mockPrizes.length)];
-    const randomLabel = mockLabels[Math.floor(Math.random() * mockLabels.length)];
-    const timestamp = new Date(now.getTime() - (i * 30 * 60 * 1000)); // 30 minutes apart
-
-    history.push({
-      id: `mock-spin-${Date.now()}-${i}`,
-      segmentId: Math.floor(Math.random() * 8) + 1,
-      prize: randomPrize,
-      timestamp: timestamp,
-      label: randomLabel,
-    });
-  }
-
-  return history;
-};
-
 export const HistoryScreen: React.FC = () => {
   const [spins, setSpins] = useState<SpinHistory[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
+  const [error, setError] = useState<string | null>(null);
   
   const { isAuthenticated, user } = useAuthStore();
 
@@ -79,86 +42,71 @@ export const HistoryScreen: React.FC = () => {
 
     try {
       setLoading(true);
+      setError(null);
       
       console.log('📚 Attempting to fetch history from Firebase...');
       console.log('🔐 Authentication status:', { isAuthenticated });
       console.log('👤 Current user:', user ? { uid: user.uid, isAnonymous: user.isAnonymous } : 'No user');
       
-      // Try Firebase Functions first
-      try {
-        const getHistory = functions().httpsCallable('getHistory');
-        
-        const currentOffset = isRefresh ? 0 : offset;
-        console.log('📊 Requesting history with params:', { limit: 20, offset: currentOffset });
-        
-        const result = await getHistory({
-          limit: 20,
-          offset: currentOffset,
-          userId: user?.uid, // Pass user ID for emulator testing
-        });
+      const getHistory = functions().httpsCallable('getHistory');
+      
+      const currentOffset = isRefresh ? 0 : offset;
+      console.log('📊 Requesting history with params:', { limit: 20, offset: currentOffset });
+      
+      const result = await getHistory({
+        limit: 20,
+        offset: currentOffset,
+        userId: user?.uid, // Pass user ID for emulator testing
+      });
 
-        const data = result.data as any;
-        console.log('✅ Firebase history result:', data);
-        
-        if (data.success) {
-          const newSpins = data.spins.map((spin: any) => ({
-            id: spin.id,
-            segmentId: spin.segmentId,
-            prize: spin.prize,
-            timestamp: new Date(spin.timestamp),
-            label: spin.prize.description,
-          }));
+      const data = result.data as any;
+      console.log('✅ Firebase history result:', data);
+      
+             if (data.success) {
+         const newSpins = data.spins.map((spin: any) => ({
+           id: spin.id,
+           segmentId: spin.segmentId,
+           prize: spin.prize,
+           timestamp: new Date(spin.timestamp),
+           label: spin.prize.description,
+         }));
 
-          if (isRefresh) {
-            setSpins(newSpins);
-            setOffset(20);
-          } else {
-            setSpins(prev => [...prev, ...newSpins]);
-            setOffset(prev => prev + 20);
-          }
-          
-          setHasMore(data.hasMore);
-          console.log('✅ History loaded from Firebase:', newSpins.length, 'spins');
-        } else {
-          throw new Error('Failed to load history from Firebase');
-        }
+         // Debug: Check for duplicate IDs
+         const ids = newSpins.map(spin => spin.id);
+         const uniqueIds = new Set(ids);
+         if (ids.length !== uniqueIds.size) {
+           console.warn('⚠️ Duplicate IDs detected:', ids.filter((id, index) => ids.indexOf(id) !== index));
+         }
+
+                 if (isRefresh) {
+           setSpins(newSpins);
+           setOffset(20);
+         } else {
+           // Prevent duplicate spins by filtering out existing IDs
+           setSpins(prev => {
+             const existingIds = new Set(prev.map(spin => spin.id));
+             const uniqueNewSpins = newSpins.filter(spin => !existingIds.has(spin.id));
+             return [...prev, ...uniqueNewSpins];
+           });
+           setOffset(prev => prev + 20);
+         }
         
-      } catch (firebaseError: any) {
-        console.warn('⚠️ Firebase history failed, using mock data:', firebaseError);
-        console.log('🔍 Firebase error details:', {
-          code: firebaseError.code,
-          message: firebaseError.message,
-          details: firebaseError.details
-        });
-        
-        // Fallback to mock history functionality
-        console.log('🎭 Using mock history functionality');
-        
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        const currentOffset = isRefresh ? 0 : offset;
-        const limit = 20;
-        const mockSpins = generateMockHistory(limit);
-        
-        // Simulate pagination
-        const hasMoreData = currentOffset < 100; // Show up to 100 mock spins
-        
-        if (isRefresh) {
-          setSpins(mockSpins);
-          setOffset(limit);
-        } else {
-          setSpins(prev => [...prev, ...mockSpins]);
-          setOffset(prev => prev + limit);
-        }
-        
-        setHasMore(hasMoreData);
-        console.log('🎭 Mock history loaded:', mockSpins.length, 'spins');
+        setHasMore(data.hasMore);
+        console.log('✅ History loaded from Firebase:', newSpins.length, 'spins');
+      } else {
+        throw new Error('Failed to load history from Firebase');
       }
       
     } catch (error: any) {
       console.error('❌ History fetch error:', error);
-      Alert.alert('Error', 'Failed to load history. Please try again.');
+      setError('Failed to load history. Please try again.');
+      
+      // Clear spins on error to show empty state
+      if (isRefresh) {
+        setSpins([]);
+        setOffset(0);
+        setHasMore(false);
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -171,7 +119,7 @@ export const HistoryScreen: React.FC = () => {
   };
 
   const loadMore = () => {
-    if (!loading && hasMore) {
+    if (!loading && hasMore && !error) {
       fetchHistory();
     }
   };
@@ -226,10 +174,24 @@ export const HistoryScreen: React.FC = () => {
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
-      <Text style={styles.emptyStateText}>No spins yet</Text>
-      <Text style={styles.emptyStateSubtext}>
-        Start spinning to see your history here!
-      </Text>
+      {error ? (
+        <>
+          <Text style={styles.emptyStateText}>Unable to load history</Text>
+          <Text style={styles.emptyStateSubtext}>
+            {error}
+          </Text>
+          <TouchableOpacity style={styles.retryButton} onPress={() => fetchHistory(true)}>
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+        </>
+      ) : (
+        <>
+          <Text style={styles.emptyStateText}>No spins yet</Text>
+          <Text style={styles.emptyStateSubtext}>
+            Start spinning to see your history here!
+          </Text>
+        </>
+      )}
     </View>
   );
 
@@ -364,6 +326,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#64748B', // Muted gray text
     textAlign: 'center',
+    marginBottom: 16,
+  },
+  retryButton: {
+    backgroundColor: '#3B82F6', // Blue button
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
   loadingFooter: {
     paddingVertical: 20,
