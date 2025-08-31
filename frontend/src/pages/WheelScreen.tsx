@@ -11,8 +11,10 @@ import {
 import { Wheel } from '../components/Wheel';
 import { RewardPopup } from '../components/RewardPopup';
 import { CooldownTimer } from '../components/CooldownTimer';
+import { AuthTest } from '../components/AuthTest';
 import { useWheelStore } from '../store/wheelStore';
 import { useAuthStore } from '../store/authStore';
+import { functions } from '../../firebase.config';
 
 interface WheelSegment {
   id: number;
@@ -211,6 +213,9 @@ export const WheelScreen: React.FC = () => {
             winningSegmentId={winningSegment?.id}
           />
         </View>
+
+        {/* Temporary AuthTest component for debugging */}
+        {/* <AuthTest /> */}
 
         <CooldownTimer
           nextAllowedAt={nextAllowedAt}

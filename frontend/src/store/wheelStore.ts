@@ -27,7 +27,7 @@ interface WheelStore {
   fetchWheelConfig: () => Promise<void>;
 }
 
-// Mock data for development
+// Mock data for development fallback
 const mockWheelConfig: WheelConfig = {
   segments: [
     {
@@ -120,7 +120,7 @@ const mockWheelConfig: WheelConfig = {
     }
   ],
   totalWeight: 100,
-  cooldownMinutes: 1,
+  cooldownMinutes: 0,
   version: 1
 };
 
@@ -133,42 +133,42 @@ export const useWheelStore = create<WheelStore>((set, get) => ({
     try {
       set({ loading: true, error: null });
       
-      console.log('🔍 Attempting to fetch wheel config...');
+      console.log('🔍 Attempting to fetch wheel config from Firestore...');
       
-      // Use mock data for now
-      console.log('🎭 Using mock wheel configuration');
-      set({ wheelConfig: mockWheelConfig, loading: false });
-      
-      // Firebase code (commented out for now)
-      /*
-      if (!firestore) {
-        throw new Error('Firestore is not initialized');
-      }
+      // Try Firebase Firestore first
+      try {
+        if (!firestore) {
+          throw new Error('Firestore is not initialized');
+        }
 
-      const firestoreInstance = firestore();
-      console.log('📡 Firestore instance created');
-      
-      const wheelConfigDoc = await firestoreInstance
-        .collection('wheelConfig')
-        .doc('default');
-      
-      console.log('📄 Document fetched, exists:', wheelConfigDoc.path);
+        const firestoreInstance = firestore();
+        console.log('📡 Firestore instance created');
+        
+        const wheelConfigDoc = await firestoreInstance
+          .collection('wheelConfig')
+          .doc('default');
+        
+        console.log('📄 Document reference created:', wheelConfigDoc.path);
 
-      const doc = await wheelConfigDoc.get();
-      console.log('📄 Document fetched, exists:', doc.exists);
-      
-      if (doc.exists) {
-        const data = doc.data() as WheelConfig;
-        console.log('✅ Wheel config loaded:', data);
-        set({ wheelConfig: data, loading: false });
-      } else {
-        console.log('⚠️ Wheel configuration document does not exist');
-        set({ 
-          error: 'Wheel configuration not found. Please run the seed script.', 
-          loading: false 
-        });
+        const doc = await wheelConfigDoc.get();
+        console.log('📄 Document fetched, exists:', doc.exists);
+        
+        if (doc.exists) {
+          const data = doc.data() as WheelConfig;
+          console.log('✅ Wheel config loaded from Firestore:', data);
+          set({ wheelConfig: data, loading: false });
+        } else {
+          console.log('⚠️ Wheel configuration document does not exist in Firestore');
+          throw new Error('Wheel configuration not found. Please run the seed script.');
+        }
+        
+      } catch (firebaseError) {
+        console.warn('⚠️ Firebase Firestore failed, using mock configuration:', firebaseError);
+        
+        // Fallback to mock data
+        console.log('🎭 Using mock wheel configuration');
+        set({ wheelConfig: mockWheelConfig, loading: false });
       }
-      */
       
     } catch (error: any) {
       console.error('❌ Error fetching wheel config:', error);

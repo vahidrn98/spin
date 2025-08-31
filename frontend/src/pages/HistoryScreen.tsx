@@ -10,6 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { useAuthStore } from '../store/authStore';
+import { functions } from '../../firebase.config';
 
 interface SpinHistory {
   id: string;
@@ -23,7 +24,7 @@ interface SpinHistory {
   label: string;
 }
 
-// Mock history data for development
+// Mock history data for development fallback
 const generateMockHistory = (count: number): SpinHistory[] => {
   const mockPrizes = [
     { type: 'coins', amount: 100, description: '100 Coins!' },
@@ -79,65 +80,74 @@ export const HistoryScreen: React.FC = () => {
     try {
       setLoading(true);
       
-      // Mock history functionality for now
-      console.log('🎭 Using mock history functionality');
+      console.log('📚 Attempting to fetch history from Firebase...');
       
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      const currentOffset = isRefresh ? 0 : offset;
-      const limit = 20;
-      const mockSpins = generateMockHistory(limit);
-      
-      // Simulate pagination
-      const hasMoreData = currentOffset < 100; // Show up to 100 mock spins
-      
-      if (isRefresh) {
-        setSpins(mockSpins);
-        setOffset(limit);
-      } else {
-        setSpins(prev => [...prev, ...mockSpins]);
-        setOffset(prev => prev + limit);
-      }
-      
-      setHasMore(hasMoreData);
-      
-      // Firebase code (commented out for now)
-      /*
-      const { getFunctions, httpsCallable } = await import('@react-native-firebase/functions');
-      const functions = getFunctions();
-      const getHistory = httpsCallable(functions, 'getHistory');
+      // Try Firebase Functions first
+      try {
+        const getHistory = functions().httpsCallable('getHistory');
+        
+        const currentOffset = isRefresh ? 0 : offset;
+        const result = await getHistory({
+          limit: 20,
+          offset: currentOffset,
+        });
 
-      const currentOffset = isRefresh ? 0 : offset;
-      const result = await getHistory({
-        limit: 20,
-        offset: currentOffset,
-      });
+        const data = result.data as any;
+        console.log('✅ Firebase history result:', data);
+        
+        if (data.success) {
+          const newSpins = data.spins.map((spin: any) => ({
+            id: spin.id,
+            segmentId: spin.segmentId,
+            prize: spin.prize,
+            timestamp: new Date(spin.timestamp),
+            label: spin.prize.description,
+          }));
 
-      const data = result.data as any;
-      
-      if (data.success) {
-        const newSpins = data.spins.map((spin: any) => ({
-          id: spin.id,
-          segmentId: spin.segmentId,
-          prize: spin.prize,
-          timestamp: new Date(spin.timestamp),
-          label: spin.prize.description,
-        }));
-
-        if (isRefresh) {
-          setSpins(newSpins);
-          setOffset(20);
+          if (isRefresh) {
+            setSpins(newSpins);
+            setOffset(20);
+          } else {
+            setSpins(prev => [...prev, ...newSpins]);
+            setOffset(prev => prev + 20);
+          }
+          
+          setHasMore(data.hasMore);
+          console.log('✅ History loaded from Firebase:', newSpins.length, 'spins');
         } else {
-          setSpins(prev => [...prev, ...newSpins]);
-          setOffset(prev => prev + 20);
+          throw new Error('Failed to load history from Firebase');
         }
         
-        setHasMore(data.hasMore);
+      } catch (firebaseError: any) {
+        console.warn('⚠️ Firebase history failed, using mock data:', firebaseError);
+        
+        // Fallback to mock history functionality
+        console.log('🎭 Using mock history functionality');
+        
+        // Simulate network delay
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        const currentOffset = isRefresh ? 0 : offset;
+        const limit = 20;
+        const mockSpins = generateMockHistory(limit);
+        
+        // Simulate pagination
+        const hasMoreData = currentOffset < 100; // Show up to 100 mock spins
+        
+        if (isRefresh) {
+          setSpins(mockSpins);
+          setOffset(limit);
+        } else {
+          setSpins(prev => [...prev, ...mockSpins]);
+          setOffset(prev => prev + limit);
+        }
+        
+        setHasMore(hasMoreData);
+        console.log('🎭 Mock history loaded:', mockSpins.length, 'spins');
       }
-      */
+      
     } catch (error: any) {
-      console.error('History fetch error:', error);
+      console.error('❌ History fetch error:', error);
       Alert.alert('Error', 'Failed to load history. Please try again.');
     } finally {
       setLoading(false);

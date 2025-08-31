@@ -1,5 +1,12 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, StyleSheet, Dimensions, Animated } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withTiming,
+  interpolate,
+  runOnJS
+} from 'react-native-reanimated';
 import Svg, { Circle, Text as SvgText, G, Path, Polygon } from 'react-native-svg';
 
 const { width } = Dimensions.get('window');
@@ -27,7 +34,7 @@ interface WheelProps {
 }
 
 export const Wheel = React.forwardRef<any, WheelProps>(({ segments, isSpinning, onSpinComplete, winningSegmentId }, ref) => {
-  const spinValue = useRef(new Animated.Value(0)).current;
+  const spinValue = useSharedValue(0);
   const [currentRotation, setCurrentRotation] = useState(0);
 
   const segmentAngle = 360 / segments.length;
@@ -66,7 +73,7 @@ export const Wheel = React.forwardRef<any, WheelProps>(({ segments, isSpinning, 
       // We need to rotate the wheel so that the target segment center moves to 0 degrees
       const finalRotation = currentRotation + (fullRotations * 360) + targetSegmentCenter;
       
-      const finalRotationDegrees = finalRotation % 360;
+      const finalRotationDegrees = finalRotation;
       const segmentAtTop = getSegmentAtTop(finalRotationDegrees);
       
       console.log('🎲 Final rotation calculation:', {
@@ -78,14 +85,16 @@ export const Wheel = React.forwardRef<any, WheelProps>(({ segments, isSpinning, 
         actualSegmentAtTop: segmentAtTop?.label
       });
       
-      Animated.timing(spinValue, {
-        toValue: finalRotation,
-        duration: 3000,
-        useNativeDriver: true,
-      }).start(() => {
-        setCurrentRotation(finalRotation % 360);
-        onSpinComplete?.(segments[targetSegmentIndex]);
-      });
+      spinValue.value = withTiming(
+        finalRotation,
+        { duration: 3000 },
+        (finished) => {
+          if (finished) {
+            runOnJS(setCurrentRotation)(finalRotation % 360);
+            runOnJS(onSpinComplete)?.(segments[targetSegmentIndex]);
+          }
+        }
+      );
     }
   }));
 
@@ -174,18 +183,21 @@ export const Wheel = React.forwardRef<any, WheelProps>(({ segments, isSpinning, 
     );
   };
 
+  const animatedStyle = useAnimatedStyle(() => {
+    const rotation = interpolate(
+      spinValue.value,
+      [0, 360],
+      [0, 360]
+    );
+    return {
+      transform: [{ rotate: `${rotation}deg` }]
+    };
+  });
+
   return (
     <View style={styles.container}>
       <Animated.View
-        style={[
-          styles.wheel,
-          {
-            transform: [{ rotate: spinValue.interpolate({
-              inputRange: [0, 360],
-              outputRange: ['0deg', '360deg']
-            }) }]
-          }
-        ]}
+        style={[styles.wheel, animatedStyle]}
       >
         <Svg width={WHEEL_SIZE} height={WHEEL_SIZE}>
           {segments.map(renderSegment)}

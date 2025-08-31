@@ -55,9 +55,9 @@ export const SettingsScreen: React.FC = () => {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
+      {/* <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
         <Text style={styles.signOutButtonText}>Sign Out</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </SafeAreaView>
   );
 };
