@@ -129,7 +129,7 @@ export const WheelScreen: React.FC = () => {
       // console.log('🔍 Data after spin:', data);
       if (data.success) {
         setWinningSegment(data.segment);
-        setLastSpinResult(data);
+        // Don't set lastSpinResult here - it will be set after reward popup is closed
         
         // Calculate next allowed time
         const nextTime = new Date();
@@ -169,14 +169,15 @@ export const WheelScreen: React.FC = () => {
     setShowReward(false);
     // Update the last spin result after the reward popup is closed
     if (winningSegment) {
-      const mockResult = {
+      // Create the result object from the actual Firebase data
+      const result = {
         success: true,
         segment: winningSegment,
         message: `Congratulations! You won: ${winningSegment.prize.description}`,
         cooldownMinutes: wheelConfig.cooldownMinutes,
         timestamp: new Date().toISOString()
       };
-      setLastSpinResult(mockResult);
+      setLastSpinResult(result);
     }
     setWinningSegment(null);
   };
