@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "458443618514",
+    "project_id": "spin-the-wheel-app-83562",
+    "storage_bucket": "spin-the-wheel-app-83562.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:458443618514:android:de8ea049613a9b2ee3150b",
+        "android_client_info": {
+          "package_name": "com.spin.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAR_Os4jU0I5A4352rfv0n64i8sfwhcHpc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
