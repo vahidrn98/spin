@@ -1,4 +1,4 @@
-package com.vahidrn98.frontend
+package com.spin.app
 
 import android.os.Build
 import android.os.Bundle
