@@ -1,9 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, StyleSheet, Dimensions, Animated } from 'react-native';
-import Svg, { Circle, Text as SvgText, G, Path } from 'react-native-svg';
+import Svg, { Circle, Text as SvgText, G, Path, Polygon } from 'react-native-svg';
 
 const { width } = Dimensions.get('window');
-const WHEEL_SIZE = width * 0.8;
+const WHEEL_SIZE = width * 0.9;
 const CENTER = WHEEL_SIZE / 2;
 const RADIUS = WHEEL_SIZE / 2 - 20;
 
@@ -23,24 +23,60 @@ interface WheelProps {
   segments: WheelSegment[];
   isSpinning: boolean;
   onSpinComplete?: (segment: WheelSegment) => void;
+  winningSegmentId?: number;
 }
 
-export const Wheel = React.forwardRef<any, WheelProps>(({ segments, isSpinning, onSpinComplete }, ref) => {
+export const Wheel = React.forwardRef<any, WheelProps>(({ segments, isSpinning, onSpinComplete, winningSegmentId }, ref) => {
   const spinValue = useRef(new Animated.Value(0)).current;
   const [currentRotation, setCurrentRotation] = useState(0);
 
   const segmentAngle = 360 / segments.length;
 
+  // Helper function to determine which segment is at the top based on rotation
+  const getSegmentAtTop = (rotation: number) => {
+    const normalizedRotation = ((rotation % 360) + 360) % 360;
+    // When wheel rotates clockwise, segments move counter-clockwise relative to the pointer
+    // So we need to calculate which segment is at the top after rotation
+    const segmentIndex = Math.floor((360 - normalizedRotation) / segmentAngle) % segments.length;
+    return segments[segmentIndex] || segments[0];
+  };
+
   // Expose spinWheel method via ref
   React.useImperativeHandle(ref, () => ({
     spinWheel: (targetSegmentId: number) => {
       const targetSegmentIndex = segments.findIndex(seg => seg.id === targetSegmentId);
-      const targetAngle = targetSegmentIndex * segmentAngle;
+      // Calculate the center angle of the target segment
+      const targetSegmentStart = targetSegmentIndex * segmentAngle;
+      const targetSegmentCenter = targetSegmentStart + (segmentAngle / 2);
+      
+      console.log('🎯 Wheel spin calculation:', {
+        targetSegmentId,
+        targetSegmentIndex,
+        targetSegmentStart,
+        targetSegmentCenter,
+        segmentAngle,
+        currentRotation,
+        segmentLabel: segments[targetSegmentIndex]?.label
+      });
       
       // Calculate the final rotation to land on the target segment
       // Add multiple full rotations for spinning effect
       const fullRotations = 5; // Number of full rotations
-      const finalRotation = currentRotation + (fullRotations * 360) + (360 - targetAngle);
+      // The wheel should land with the target segment at the top (where the pointer is)
+      // We need to rotate the wheel so that the target segment center moves to 0 degrees
+      const finalRotation = currentRotation + (fullRotations * 360) + targetSegmentCenter;
+      
+      const finalRotationDegrees = finalRotation % 360;
+      const segmentAtTop = getSegmentAtTop(finalRotationDegrees);
+      
+      console.log('🎲 Final rotation calculation:', {
+        fullRotations,
+        targetSegmentCenter,
+        finalRotation,
+        finalRotationDegrees,
+        expectedSegment: segments[targetSegmentIndex]?.label,
+        actualSegmentAtTop: segmentAtTop?.label
+      });
       
       Animated.timing(spinValue, {
         toValue: finalRotation,
@@ -93,17 +129,47 @@ export const Wheel = React.forwardRef<any, WheelProps>(({ segments, isSpinning, 
           stroke="#333"
           strokeWidth={1}
         />
-        <SvgText
-          x={textX}
-          y={textY}
-          fontSize={12}
-          fill="white"
-          textAnchor="middle"
-          alignmentBaseline="middle"
-          fontWeight="bold"
+        <G
+          transform={`translate(${textX}, ${textY}) rotate(${textAngle})`}
         >
-          {segment.label}
-        </SvgText>
+          <SvgText
+            x={0}
+            y={0}
+            fontSize={12}
+            fill="white"
+            textAnchor="middle"
+            alignmentBaseline="middle"
+            fontWeight="bold"
+          >
+            {segment.label}
+          </SvgText>
+        </G>
+      </G>
+    );
+  };
+
+  // Render the pointer/indicator
+  const renderPointer = () => {
+    const pointerPoints = [
+      `${CENTER},${CENTER - RADIUS - 10}`,
+      `${CENTER - 15},${CENTER - RADIUS + 5}`,
+      `${CENTER + 15},${CENTER - RADIUS + 5}`
+    ].join(' ');
+
+    return (
+      <G>
+        <Polygon
+          points={pointerPoints}
+          fill="#4ADE80"
+          stroke="#0F172A"
+          strokeWidth={2}
+        />
+        <Circle
+          cx={CENTER}
+          cy={CENTER - RADIUS + 5}
+          r={3}
+          fill="#0F172A"
+        />
       </G>
     );
   };
@@ -128,12 +194,19 @@ export const Wheel = React.forwardRef<any, WheelProps>(({ segments, isSpinning, 
             cx={CENTER}
             cy={CENTER}
             r={15}
-            fill="#333"
-            stroke="#fff"
+            fill="#1E293B"
+            stroke="#4ADE80"
             strokeWidth={3}
           />
         </Svg>
       </Animated.View>
+      
+      {/* Static pointer that doesn't rotate with the wheel */}
+      <View style={styles.pointerContainer}>
+        <Svg width={WHEEL_SIZE} height={WHEEL_SIZE}>
+          {renderPointer()}
+        </Svg>
+      </View>
     </View>
   );
 });
@@ -142,9 +215,19 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
   },
   wheel: {
     width: WHEEL_SIZE,
     height: WHEEL_SIZE,
+  },
+  pointerContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

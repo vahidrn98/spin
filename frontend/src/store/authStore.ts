@@ -1,20 +1,29 @@
 import { create } from 'zustand';
-import { 
-  getAuth, 
-  signInAnonymously, 
-  onAuthStateChanged, 
-  User,
-  signOut 
-} from '@react-native-firebase/auth';
+import { auth } from '../../firebase.config';
 
 interface AuthStore {
-  user: User | null;
+  user: any;
   isAuthenticated: boolean;
   loading: boolean;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
-  initializeAuth: () => void;
+  initializeAuth: () => () => void;
 }
+
+// Mock user data for development
+const mockUser = {
+  uid: 'mock-user-123',
+  email: 'mock@example.com',
+  displayName: 'Mock User',
+  isAnonymous: true,
+  emailVerified: false,
+  photoURL: null,
+  phoneNumber: null,
+  metadata: {
+    creationTime: new Date().toISOString(),
+    lastSignInTime: new Date().toISOString()
+  }
+};
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
   user: null,
@@ -24,8 +33,16 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   signIn: async () => {
     try {
       set({ loading: true });
-      const auth = getAuth();
-      await signInAnonymously(auth);
+      
+      // Use mock authentication for now
+      console.log('🎭 Using mock authentication');
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+      set({ user: mockUser, isAuthenticated: true, loading: false });
+      
+      // Firebase code (commented out for now)
+      /*
+      await auth().signInAnonymously();
+      */
     } catch (error) {
       console.error('Sign in error:', error);
       set({ loading: false });
@@ -34,25 +51,49 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   signOut: async () => {
     try {
-      const auth = getAuth();
-      await signOut(auth);
+      // Use mock sign out for now
+      console.log('🎭 Mock sign out');
+      set({ user: null, isAuthenticated: false });
+      
+      // Firebase code (commented out for now)
+      /*
+      await auth().signOut();
+      */
     } catch (error) {
       console.error('Sign out error:', error);
     }
   },
 
   initializeAuth: () => {
-    const auth = getAuth();
+    // Use mock authentication initialization for now
+    console.log('🎭 Initializing mock authentication');
     
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    // Simulate a brief loading period
+    setTimeout(() => {
+      set({ 
+        user: mockUser, 
+        isAuthenticated: true, 
+        loading: false 
+      });
+    }, 500);
+    
+    // Return a mock unsubscribe function
+    const mockUnsubscribe = () => {
+      console.log('🎭 Mock auth unsubscribe');
+    };
+    
+    // Firebase code (commented out for now)
+    /*
+    const unsubscribe = auth().onAuthStateChanged((user) => {
       set({ 
         user, 
         isAuthenticated: !!user, 
         loading: false 
       });
     });
-
-    // Return unsubscribe function for cleanup
     return unsubscribe;
+    */
+    
+    return mockUnsubscribe;
   },
 }));

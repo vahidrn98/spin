@@ -65,28 +65,40 @@ export const SettingsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#0F172A', // Navy background
   },
   header: {
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#1E293B', // Dark slate background
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#334155', // Dark border
+    alignItems: 'center',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#F8FAFC', // Light text
+    textAlign: 'center',
   },
   section: {
-    backgroundColor: 'white',
+    backgroundColor: '#1E293B', // Dark slate background
     marginTop: 20,
     paddingHorizontal: 20,
+    borderRadius: 10,
+    marginHorizontal: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#F8FAFC', // Light text
     marginVertical: 15,
   },
   settingItem: {
@@ -95,22 +107,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: '#334155', // Dark border
   },
   settingLabel: {
     fontSize: 16,
-    color: '#333',
+    color: '#F8FAFC', // Light text
   },
   settingValue: {
     fontSize: 16,
-    color: '#666',
+    color: '#94A3B8', // Light gray text
   },
   signOutButton: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: '#EF4444', // Red for sign out
     margin: 20,
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
+    shadowColor: '#EF4444',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   signOutButtonText: {
     color: 'white',

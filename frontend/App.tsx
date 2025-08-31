@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
+import { Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { WheelScreen } from './src/pages/WheelScreen';
 import { HistoryScreen } from './src/pages/HistoryScreen';
 import { SettingsScreen } from './src/pages/SettingsScreen';
@@ -20,22 +22,24 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
       <Tab.Navigator
         screenOptions={{
-          tabBarActiveTintColor: '#007AFF',
-          tabBarInactiveTintColor: '#666',
+          tabBarActiveTintColor: '#4ADE80', // Green
+          tabBarInactiveTintColor: '#64748B', // Slate gray
           tabBarStyle: {
-            backgroundColor: 'white',
-            borderTopWidth: 1,
-            borderTopColor: '#e0e0e0',
+            backgroundColor: '#0F172A', // Navy
+            borderTopWidth: 0,
+            elevation: 0,
+            shadowOpacity: 0,
+            height: 60,
+            paddingBottom: 8,
+            paddingTop: 8,
           },
-          headerStyle: {
-            backgroundColor: '#007AFF',
-          },
-          headerTintColor: 'white',
-          headerTitleStyle: {
-            fontWeight: 'bold',
+          headerShown: false,
+          tabBarLabelStyle: {
+            fontSize: 12,
+            fontWeight: '500',
           },
         }}
       >
@@ -43,9 +47,13 @@ export default function App() {
           name="Wheel"
           component={WheelScreen}
           options={{
-            title: '🎰 Spin & Win',
-            tabBarIcon: ({ color, size }) => (
-              <span style={{ color, fontSize: size }}>🎰</span>
+            title: 'Spin & Win',
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons 
+                name={focused ? "game-controller" : "game-controller-outline"} 
+                size={size} 
+                color={color} 
+              />
             ),
           }}
         />
@@ -53,9 +61,13 @@ export default function App() {
           name="History"
           component={HistoryScreen}
           options={{
-            title: '📋 History',
-            tabBarIcon: ({ color, size }) => (
-              <span style={{ color, fontSize: size }}>📋</span>
+            title: 'History',
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons 
+                name={focused ? "time" : "time-outline"} 
+                size={size} 
+                color={color} 
+              />
             ),
           }}
         />
@@ -63,9 +75,13 @@ export default function App() {
           name="Settings"
           component={SettingsScreen}
           options={{
-            title: '⚙️ Settings',
-            tabBarIcon: ({ color, size }) => (
-              <span style={{ color, fontSize: size }}>⚙️</span>
+            title: 'Settings',
+            tabBarIcon: ({ color, size, focused }) => (
+              <Ionicons 
+                name={focused ? "settings" : "settings-outline"} 
+                size={size} 
+                color={color} 
+              />
             ),
           }}
         />

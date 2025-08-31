@@ -60,6 +60,58 @@ export const WheelScreen: React.FC = () => {
     setIsSpinning(true);
 
     try {
+      // Mock spin functionality for now
+      console.log('🎭 Using mock spin functionality');
+      
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Randomly select a winning segment based on weights
+      const totalWeight = wheelConfig.totalWeight;
+      let randomValue = Math.random() * totalWeight;
+      let winningSegment = wheelConfig.segments[0];
+      
+      for (const segment of wheelConfig.segments) {
+        randomValue -= segment.weight;
+        if (randomValue <= 0) {
+          winningSegment = segment;
+          break;
+        }
+      }
+      
+      console.log('🎯 Selected winning segment:', {
+        id: winningSegment.id,
+        label: winningSegment.label,
+        index: wheelConfig.segments.findIndex(s => s.id === winningSegment.id)
+      });
+      
+      // Create mock result
+      const mockResult = {
+        success: true,
+        segment: winningSegment,
+        message: `Congratulations! You won: ${winningSegment.prize.description}`,
+        cooldownMinutes: wheelConfig.cooldownMinutes,
+        timestamp: new Date().toISOString()
+      };
+      
+      console.log('🎰 Mock spin result:', mockResult);
+      
+      setWinningSegment(winningSegment);
+      // lastSpinResult will be set after the reward popup is closed
+      
+      // Calculate next allowed time
+      const nextTime = new Date();
+      nextTime.setMinutes(nextTime.getMinutes() + mockResult.cooldownMinutes);
+      setNextAllowedAt(nextTime);
+      
+      // Trigger wheel animation
+      if (wheelRef.current) {
+        console.log('🎲 Spinning wheel to segment ID:', winningSegment.id);
+        wheelRef.current.spinWheel(winningSegment.id);
+      }
+      
+      // Firebase code (commented out for now)
+      /*
       // Call Firebase Function
       const { getFunctions, httpsCallable } = await import('@react-native-firebase/functions');
       const functions = getFunctions();
@@ -87,6 +139,8 @@ export const WheelScreen: React.FC = () => {
       } else {
         Alert.alert('Error', 'Failed to process spin. Please try again.');
       }
+      */
+      
     } catch (error: any) {
       console.error('Spin error:', error);
       
@@ -108,6 +162,17 @@ export const WheelScreen: React.FC = () => {
 
   const handleRewardClose = () => {
     setShowReward(false);
+    // Update the last spin result after the reward popup is closed
+    if (winningSegment) {
+      const mockResult = {
+        success: true,
+        segment: winningSegment,
+        message: `Congratulations! You won: ${winningSegment.prize.description}`,
+        cooldownMinutes: wheelConfig.cooldownMinutes,
+        timestamp: new Date().toISOString()
+      };
+      setLastSpinResult(mockResult);
+    }
     setWinningSegment(null);
   };
 
@@ -131,10 +196,10 @@ export const WheelScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={styles.title}>🎰 Spin & Win 🎰</Text>
-          {user && (
+          <Text style={styles.title}>Spin & Win</Text>
+          {/* {user && (
             <Text style={styles.userInfo}>Welcome, {user.email}</Text>
-          )}
+          )} */}
         </View>
 
         <View style={styles.wheelContainer}>
@@ -143,6 +208,7 @@ export const WheelScreen: React.FC = () => {
             segments={wheelConfig.segments}
             isSpinning={isSpinning}
             onSpinComplete={handleSpinComplete}
+            winningSegmentId={winningSegment?.id}
           />
         </View>
 
@@ -166,10 +232,30 @@ export const WheelScreen: React.FC = () => {
 
         {lastSpinResult && (
           <View style={styles.lastSpinContainer}>
-            <Text style={styles.lastSpinTitle}>Last Spin Result:</Text>
-            <Text style={styles.lastSpinText}>
-              {lastSpinResult.message}
-            </Text>
+            <View style={styles.lastSpinHeader}>
+              <Text style={styles.lastSpinIcon}>🎉</Text>
+              <Text style={styles.lastSpinTitle}>Last Spin Result</Text>
+            </View>
+            <View style={styles.lastSpinContent}>
+              <Text style={styles.lastSpinMessage}>
+                {lastSpinResult.message}
+              </Text>
+              <View style={styles.lastSpinDetails}>
+                <View style={styles.lastSpinDetail}>
+                  <Text style={styles.lastSpinDetailLabel}>Segment</Text>
+                  <Text style={styles.lastSpinDetailValue}>
+                    {lastSpinResult.segment.label}
+                  </Text>
+                </View>
+                <View style={styles.lastSpinDetail}>
+                  <Text style={styles.lastSpinDetailLabel}>Prize</Text>
+                  <Text style={styles.lastSpinDetailValue}>
+                    {lastSpinResult.segment.prize.description}
+                  </Text>
+                </View>
+                
+              </View>
+            </View>
           </View>
         )}
       </ScrollView>
@@ -186,7 +272,7 @@ export const WheelScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#0F172A', // Navy background
   },
   scrollContent: {
     flexGrow: 1,
@@ -199,72 +285,118 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 18,
-    color: '#666',
+    color: '#94A3B8', // Light gray text
   },
   header: {
     alignItems: 'center',
     marginBottom: 20,
+    paddingTop: 20,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 5,
+    color: '#F8FAFC', // Light text
+    textAlign: 'center',
   },
   userInfo: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 22,
+    color: '#94A3B8', // Light gray text
+    textAlign: 'center',
+    paddingTop: 20,
   },
   wheelContainer: {
     alignItems: 'center',
     marginVertical: 20,
   },
   spinButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#4ADE80', // Green
     paddingVertical: 15,
     paddingHorizontal: 30,
-    borderRadius: 25,
+    borderRadius: 15,
     alignItems: 'center',
     marginVertical: 20,
-    shadowColor: '#000',
+    shadowColor: '#4ADE80',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   spinButtonDisabled: {
-    backgroundColor: '#ccc',
+    backgroundColor: '#334155', // Dark gray when disabled
+    shadowOpacity: 0,
+    elevation: 0,
   },
   spinButtonText: {
-    color: 'white',
+    color: '#0F172A', // Dark text on green button
     fontSize: 18,
     fontWeight: 'bold',
   },
   lastSpinContainer: {
-    backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-    elevation: 3,
+    backgroundColor: '#1E293B', // Dark slate background
+    padding: 20,
+    borderRadius: 15,
+    marginTop: 20
+  },
+  lastSpinHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#334155',
+  },
+  lastSpinIcon: {
+    fontSize: 28,
+    marginRight: 10,
   },
   lastSpinTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#F8FAFC', // Light text
+  },
+  lastSpinContent: {
+    backgroundColor: '#273544', // Slightly lighter background for content
+    padding: 15,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#3F4A5C',
+  },
+  lastSpinMessage: {
+    fontSize: 16,
+    color: '#E2E8F0', // Lighter text for better readability
+    marginBottom: 15,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  lastSpinDetails: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  lastSpinDetail: {
+    flex: 1,
+    marginRight: 15,
+    alignItems: 'center',
+    padding: 10,
+    backgroundColor: '#1E293B',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#334155',
+  },
+  lastSpinDetailLabel: {
+    fontSize: 12,
+    color: '#94A3B8', // Light gray text
+    marginBottom: 5,
+    fontWeight: '500',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  lastSpinDetailValue: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 5,
-  },
-  lastSpinText: {
-    fontSize: 14,
-    color: '#666',
+    color: '#4ADE80', // Green text for values
+    textAlign: 'center',
   },
 });

@@ -23,6 +23,44 @@ interface SpinHistory {
   label: string;
 }
 
+// Mock history data for development
+const generateMockHistory = (count: number): SpinHistory[] => {
+  const mockPrizes = [
+    { type: 'coins', amount: 100, description: '100 Coins!' },
+    { type: 'coins', amount: 50, description: '50 Coins!' },
+    { type: 'special', amount: 1, description: 'Diamond Reward!' },
+    { type: 'coins', amount: 25, description: '25 Coins!' },
+    { type: 'bonus', amount: 2, description: '2x Multiplier!' },
+    { type: 'coins', amount: 10, description: '10 Coins!' },
+    { type: 'coins', amount: 75, description: '75 Coins!' },
+    { type: 'jackpot', amount: 1000, description: 'JACKPOT! 1000 Coins!' },
+  ];
+
+  const mockLabels = [
+    '🎁 Prize A', '🏆 Prize B', '💎 Rare Prize', '🎯 Prize C',
+    '⭐ Bonus', '🎈 Prize D', '🎊 Prize E', '🔥 Jackpot'
+  ];
+
+  const history: SpinHistory[] = [];
+  const now = new Date();
+
+  for (let i = 0; i < count; i++) {
+    const randomPrize = mockPrizes[Math.floor(Math.random() * mockPrizes.length)];
+    const randomLabel = mockLabels[Math.floor(Math.random() * mockLabels.length)];
+    const timestamp = new Date(now.getTime() - (i * 30 * 60 * 1000)); // 30 minutes apart
+
+    history.push({
+      id: `mock-spin-${Date.now()}-${i}`,
+      segmentId: Math.floor(Math.random() * 8) + 1,
+      prize: randomPrize,
+      timestamp: timestamp,
+      label: randomLabel,
+    });
+  }
+
+  return history;
+};
+
 export const HistoryScreen: React.FC = () => {
   const [spins, setSpins] = useState<SpinHistory[]>([]);
   const [loading, setLoading] = useState(false);
@@ -41,6 +79,31 @@ export const HistoryScreen: React.FC = () => {
     try {
       setLoading(true);
       
+      // Mock history functionality for now
+      console.log('🎭 Using mock history functionality');
+      
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      const currentOffset = isRefresh ? 0 : offset;
+      const limit = 20;
+      const mockSpins = generateMockHistory(limit);
+      
+      // Simulate pagination
+      const hasMoreData = currentOffset < 100; // Show up to 100 mock spins
+      
+      if (isRefresh) {
+        setSpins(mockSpins);
+        setOffset(limit);
+      } else {
+        setSpins(prev => [...prev, ...mockSpins]);
+        setOffset(prev => prev + limit);
+      }
+      
+      setHasMore(hasMoreData);
+      
+      // Firebase code (commented out for now)
+      /*
       const { getFunctions, httpsCallable } = await import('@react-native-firebase/functions');
       const functions = getFunctions();
       const getHistory = httpsCallable(functions, 'getHistory');
@@ -72,6 +135,7 @@ export const HistoryScreen: React.FC = () => {
         
         setHasMore(data.hasMore);
       }
+      */
     } catch (error: any) {
       console.error('History fetch error:', error);
       Alert.alert('Error', 'Failed to load history. Please try again.');
@@ -184,40 +248,45 @@ export const HistoryScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#0F172A', // Navy background
   },
   header: {
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#1E293B', // Dark slate background
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#334155', // Dark border
+    alignItems: 'center',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#F8FAFC', // Light text
     marginBottom: 5,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 14,
-    color: '#666',
+    color: '#94A3B8', // Light gray text
+    textAlign: 'center',
   },
   listContainer: {
     padding: 20,
   },
   spinItem: {
-    backgroundColor: 'white',
+    backgroundColor: '#1E293B', // Dark slate background
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 2,
     },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-    elevation: 3,
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: '#334155', // Dark border
   },
   spinHeader: {
     flexDirection: 'row',
@@ -228,7 +297,7 @@ const styles = StyleSheet.create({
   spinLabel: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#F8FAFC', // Light text
     flex: 1,
   },
   spinIcon: {
@@ -242,11 +311,11 @@ const styles = StyleSheet.create({
   spinAmount: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#007AFF',
+    color: '#4ADE80', // Green accent
   },
   spinDate: {
     fontSize: 12,
-    color: '#666',
+    color: '#94A3B8', // Light gray text
   },
   emptyState: {
     alignItems: 'center',
@@ -256,12 +325,12 @@ const styles = StyleSheet.create({
   emptyStateText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#666',
+    color: '#94A3B8', // Light gray text
     marginBottom: 8,
   },
   emptyStateSubtext: {
     fontSize: 14,
-    color: '#999',
+    color: '#64748B', // Muted gray text
     textAlign: 'center',
   },
   loadingFooter: {
@@ -270,6 +339,6 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 14,
-    color: '#666',
+    color: '#94A3B8', // Light gray text
   },
 });
