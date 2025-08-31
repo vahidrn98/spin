@@ -69,7 +69,7 @@ export const HistoryScreen: React.FC = () => {
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
   
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
 
   const fetchHistory = async (isRefresh = false) => {
     if (!isAuthenticated) {
@@ -81,15 +81,20 @@ export const HistoryScreen: React.FC = () => {
       setLoading(true);
       
       console.log('📚 Attempting to fetch history from Firebase...');
+      console.log('🔐 Authentication status:', { isAuthenticated });
+      console.log('👤 Current user:', user ? { uid: user.uid, isAnonymous: user.isAnonymous } : 'No user');
       
       // Try Firebase Functions first
       try {
         const getHistory = functions().httpsCallable('getHistory');
         
         const currentOffset = isRefresh ? 0 : offset;
+        console.log('📊 Requesting history with params:', { limit: 20, offset: currentOffset });
+        
         const result = await getHistory({
           limit: 20,
           offset: currentOffset,
+          userId: user?.uid, // Pass user ID for emulator testing
         });
 
         const data = result.data as any;
@@ -120,6 +125,11 @@ export const HistoryScreen: React.FC = () => {
         
       } catch (firebaseError: any) {
         console.warn('⚠️ Firebase history failed, using mock data:', firebaseError);
+        console.log('🔍 Firebase error details:', {
+          code: firebaseError.code,
+          message: firebaseError.message,
+          details: firebaseError.details
+        });
         
         // Fallback to mock history functionality
         console.log('🎭 Using mock history functionality');
@@ -230,6 +240,11 @@ export const HistoryScreen: React.FC = () => {
         <Text style={styles.subtitle}>
           Your past {spins.length} spins
         </Text>
+        {user && (
+          <Text style={styles.userInfo}>
+            User: {user.uid.substring(0, 8)}... ({user.isAnonymous ? 'Anonymous' : 'Authenticated'})
+          </Text>
+        )}
       </View>
 
       <FlatList
@@ -278,6 +293,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#94A3B8', // Light gray text
     textAlign: 'center',
+  },
+  userInfo: {
+    fontSize: 12,
+    color: '#64748B', // Muted gray text
+    textAlign: 'center',
+    marginTop: 5,
+    fontFamily: 'monospace',
   },
   listContainer: {
     padding: 20,

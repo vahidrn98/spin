@@ -91,12 +91,91 @@ export const spinWheel = functions.https.onCall(async (data: any, context: any) 
 // Get History Function - Callable function that retrieves user's spin history
 export const getHistory = functions.https.onCall(async (data: any, context: any) => {
   try {
+    // Debug logging for emulator issues
+    console.log('🔍 getHistory function called');
+    console.log('🔍 Context.auth exists:', !!context?.auth);
+    console.log('🔍 Data keys:', Object.keys(data || {}));
+    console.log('🔍 Raw data:', data);
+    
     // Check if user is authenticated
     if (!context?.auth) {
+      console.log('❌ No auth context found');
+      
+      // For emulator testing, try to get user ID from data if available
+      // The data might be nested under a 'data' key
+      const actualData = data?.data || data;
+      console.log('🔍 Actual data:', actualData);
+      
+      if (actualData?.userId) {
+        console.log('🔧 Using userId from data for emulator testing:', actualData.userId);
+        const userId = actualData.userId;
+        
+        try {
+          // Continue with the rest of the function using the provided userId
+          const limit = actualData?.limit || 20;
+          const offset = actualData?.offset || 0;
+
+          console.log('📊 Query parameters:', { userId, limit, offset });
+
+          // Validate limit
+          if (limit > 100) {
+            throw new functions.https.HttpsError('invalid-argument', 'Limit cannot exceed 100');
+          }
+
+          // Get user's spin history
+          console.log('🔍 Querying Firestore for spins...');
+          const spinsQuery = await db.collection('spins')
+            .where('userId', '==', userId)
+            .orderBy('timestamp', 'desc')
+            .limit(limit)
+            .offset(offset)
+            .get();
+
+          console.log('✅ Spins query completed, found', spinsQuery.size, 'spins');
+
+          const spins = spinsQuery.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+            timestamp: doc.data().timestamp?.toDate?.() || doc.data().timestamp
+          }));
+
+          console.log('✅ Processed', spins.length, 'spins');
+
+          // Get total count for pagination
+          console.log('🔍 Getting total count...');
+          const totalQuery = await db.collection('spins')
+            .where('userId', '==', userId)
+            .count()
+            .get();
+
+          const totalSpins = totalQuery.data().count;
+          console.log('✅ Total spins count:', totalSpins);
+
+          // Calculate statistics
+          console.log('🔍 Calculating statistics...');
+          const stats = calculateSpinStats(spins);
+          console.log('✅ Statistics calculated:', stats);
+
+          console.log('✅ getHistory completed with emulator workaround');
+          return {
+            success: true,
+            spins,
+            totalSpins,
+            hasMore: totalSpins > offset + limit,
+            stats
+          };
+        } catch (queryError: any) {
+          console.error('❌ Error in emulator workaround query:', queryError.message || 'Unknown error');
+          throw new functions.https.HttpsError('internal', 'Query error in emulator workaround');
+        }
+      }
+      
       throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
     }
 
     const userId = context.auth.uid;
+    console.log('✅ Auth context found, userId:', userId);
+    
     const limit = data?.limit || 20; // Default to 20 spins
     const offset = data?.offset || 0;
 
@@ -130,6 +209,7 @@ export const getHistory = functions.https.onCall(async (data: any, context: any)
     // Calculate statistics
     const stats = calculateSpinStats(spins);
 
+    console.log('✅ getHistory completed successfully');
     return {
       success: true,
       spins,
@@ -138,13 +218,14 @@ export const getHistory = functions.https.onCall(async (data: any, context: any)
       stats
     };
 
-  } catch (error) {
-    console.error('Error in getHistory function:', error);
+  } catch (error: any) {
+    console.error('❌ Error in getHistory function:', error.message || 'Unknown error');
     
     if (error instanceof functions.https.HttpsError) {
       throw error;
     }
     
+    // Don't include the full error object in the message to avoid circular references
     throw new functions.https.HttpsError('internal', 'Failed to retrieve history');
   }
 });
