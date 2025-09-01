@@ -40,6 +40,17 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       try {
         const userCredential = await auth().signInAnonymously();
         console.log('✅ Firebase authentication successful:', userCredential.user.uid);
+        
+        // Update the user profile with display name
+        try {
+          await userCredential.user.updateProfile({
+            displayName: "Anonymous User"
+          });
+          console.log('✅ User profile updated with display name');
+        } catch (profileError) {
+          console.warn('⚠️ Failed to update user profile:', profileError);
+        }
+        
         set({ user: userCredential.user, isAuthenticated: true, loading: false });
       } catch (firebaseError) {
         console.warn('⚠️ Firebase auth failed, using mock authentication:', firebaseError);
@@ -85,11 +96,27 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     try {
       // Add a small delay to ensure Firebase SDK is fully initialized
       setTimeout(async () => {
-        // Try to automatically sign in anonymously
-        try {
-          const userCredential = await auth().signInAnonymously();
-          console.log('✅ Automatic sign in successful:', userCredential.user.uid);
-          set({ user: userCredential.user, isAuthenticated: true, loading: false });
+                  // Try to automatically sign in anonymously
+          try {
+            const userCredential = await auth().signInAnonymously();
+            console.log('✅ Automatic sign in successful:', userCredential.user.uid);
+            
+            // Update the user profile with display name
+            // timer 3 seconds
+            // setTimeout(async () => {
+            // try {
+            //   await userCredential.user.updateProfile({
+            //     displayName: "Anonymous User",
+            //     uid: userCredential.user.uid,
+            //     email: "anonymous@example.com",
+            //   });
+            //   console.log('✅ User profile updated with display name');
+            //   } catch (profileError) {
+            //     console.warn('⚠️ Failed to update user profile:', profileError);
+            //   }
+            // }, 200);
+            
+            set({ user: userCredential.user, isAuthenticated: true, loading: false });
 
           // The auth state listener will be called again with the new user
           // so we don't need to set the state here
@@ -104,7 +131,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             loading: false
           });
         }
-      }, 1000); // 1 second delay
+      }, 100); // 1 second delay
 
     } catch (firebaseError) {
       console.warn('⚠️ Firebase auth initialization failed, using mock auth:', firebaseError);

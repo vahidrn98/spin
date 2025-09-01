@@ -97,14 +97,15 @@ export const WheelScreen: React.FC = () => {
       
       
     } catch (error: any) {
-      console.error('Spin error:', error);
+      console.log('Spin error:', error);
+      Alert.alert('Error', error.message);
       
       if (error.code === 'functions/failed-precondition') {
         Alert.alert('Cooldown Active', error.message);
       } else if (error.code === 'functions/unauthenticated') {
         Alert.alert('Authentication Required', 'Please sign in to spin the wheel.');
       } else {
-        Alert.alert('Error', 'Something went wrong. Please try again.');
+        console.log('Error', 'Something went wrong. Please try again.');
       }
     } finally {
       setIsSpinning(false);
