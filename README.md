@@ -14,6 +14,7 @@ Wheel/
 │   ├── src/
 │   │   ├── components/ # Reusable UI components
 │   │   ├── pages/      # Screen components
+│   │   ├── styles/     # Centralized styling system
 │   │   └── store/      # Zustand state management
 │   └── android/        # Android-specific files
 └── README.md           # This file
@@ -206,6 +207,41 @@ Built with **Zustand** for lightweight, fast state management:
 - **`useAuthStore`** - Authentication state
 - **`useWheelStore`** - Wheel configuration and game state
 
+## 🎨 Styling Architecture
+
+The app uses a **centralized styling system** for better organization and maintainability:
+
+### **Style Organization**
+```
+frontend/src/styles/
+├── index.ts                    # Exports all style objects
+├── RewardPopup.styles.ts       # Reward popup component styles
+├── Wheel.styles.ts            # Wheel component styles
+├── CooldownTimer.styles.ts    # Cooldown timer component styles
+├── AuthTest.styles.ts         # Auth test component styles
+├── WheelScreen.styles.ts      # Main wheel screen styles
+├── HistoryScreen.styles.ts    # History screen styles
+└── SettingsScreen.styles.ts   # Settings screen styles
+```
+
+### **Benefits**
+- **📁 Organized Structure**: Each component has its own dedicated style file
+- **🔄 Easy Imports**: Centralized index file for simple imports (`import { wheelScreenStyles } from '../styles'`)
+- **🔧 Maintainable**: Styles are separated from component logic for easier maintenance
+- **🎯 Reusable**: Style objects can be easily shared between components if needed
+- **📱 Consistent**: Enforces consistent styling patterns across the app
+
+### **Usage Example**
+```typescript
+// Import styles
+import { wheelScreenStyles } from '../styles';
+
+// Use in component
+<View style={wheelScreenStyles.container}>
+  <Text style={wheelScreenStyles.title}>Spin & Win</Text>
+</View>
+```
+
 ## 🧪 Testing
 
 ### Firebase Functions Testing
@@ -342,6 +378,10 @@ The app implements several mechanisms to ensure fair gameplay:
 #### **Chosen: Server-Side Game Logic**
 - **✅ Pros**: Prevents cheating, centralized control, easier updates, fair gameplay
 - **❌ Cons**: Requires internet, potential latency, server costs, single point of failure
+
+#### **Chosen: Centralized Styling System**
+- **✅ Pros**: Organized style management, separation of concerns, reusable styles, easier maintenance
+- **❌ Cons**: More files to manage, requires consistent naming conventions, potential for style duplication
 
 #### **Chosen: No Styling Library (e.g., nativewind) Installed**
 - **✅ Pros**: Full control over styles, no extra dependencies, smaller bundle size, easier debugging

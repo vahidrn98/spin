@@ -2,12 +2,12 @@ import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   Modal,
   TouchableOpacity,
   Animated,
   Dimensions,
 } from 'react-native';
+import { rewardPopupStyles } from '../styles';
 
 const { width, height } = Dimensions.get('window');
 
@@ -107,119 +107,53 @@ export const RewardPopup: React.FC<RewardPopupProps> = ({
       animationType="none"
       onRequestClose={onClose}
     >
-      <Animated.View
-        style={[
-          styles.overlay,
-          {
-            opacity: opacityAnim,
-          },
-        ]}
-      >
-        <Animated.View
+              <Animated.View
           style={[
-            styles.popup,
+            rewardPopupStyles.overlay,
             {
-              transform: [{ scale: scaleAnim }],
+              opacity: opacityAnim,
             },
           ]}
         >
-          <View style={styles.header}>
-            <Text style={styles.congratsText}>🎉 Congratulations! 🎉</Text>
-          </View>
+          <Animated.View
+            style={[
+              rewardPopupStyles.popup,
+              {
+                transform: [{ scale: scaleAnim }],
+              },
+            ]}
+          >
+            <View style={rewardPopupStyles.header}>
+              <Text style={rewardPopupStyles.congratsText}>🎉 Congratulations! 🎉</Text>
+            </View>
 
-          <View style={styles.prizeContainer}>
-            <Text style={styles.prizeIcon}>
-              {getPrizeIcon(segment.prize.type)}
-            </Text>
-            <Text style={styles.prizeLabel}>{segment.label}</Text>
-            <Text style={styles.prizeDescription}>
-              {segment.prize.description}
-            </Text>
-            <Text
-              style={[
-                styles.prizeAmount,
-                { color: getPrizeColor(segment.prize.type) },
-              ]}
-            >
-              {segment.prize.amount}
-              {segment.prize.type === 'coins' && ' Coins'}
-              {segment.prize.type === 'bonus' && 'x Multiplier'}
-            </Text>
-          </View>
+            <View style={rewardPopupStyles.prizeContainer}>
+              <Text style={rewardPopupStyles.prizeIcon}>
+                {getPrizeIcon(segment.prize.type)}
+              </Text>
+              <Text style={rewardPopupStyles.prizeLabel}>{segment.label}</Text>
+              <Text style={rewardPopupStyles.prizeDescription}>
+                {segment.prize.description}
+              </Text>
+              <Text
+                style={[
+                  rewardPopupStyles.prizeAmount,
+                  { color: getPrizeColor(segment.prize.type) },
+                ]}
+              >
+                {segment.prize.amount}
+                {segment.prize.type === 'coins' && ' Coins'}
+                {segment.prize.type === 'bonus' && 'x Multiplier'}
+              </Text>
+            </View>
 
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Text style={styles.closeButtonText}>Continue</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={rewardPopupStyles.closeButton} onPress={onClose}>
+              <Text style={rewardPopupStyles.closeButtonText}>Continue</Text>
+            </TouchableOpacity>
+          </Animated.View>
         </Animated.View>
-      </Animated.View>
     </Modal>
   );
 };
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  popup: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 30,
-    margin: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 10,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 10,
-  },
-  header: {
-    marginBottom: 20,
-  },
-  congratsText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#333',
-  },
-  prizeContainer: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  prizeIcon: {
-    fontSize: 60,
-    marginBottom: 10,
-  },
-  prizeLabel: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 5,
-  },
-  prizeDescription: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  prizeAmount: {
-    fontSize: 28,
-    fontWeight: 'bold',
-  },
-  closeButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 30,
-    paddingVertical: 15,
-    borderRadius: 25,
-  },
-  closeButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});
+

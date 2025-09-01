@@ -15,7 +15,7 @@ const createUserInAuth = async () => {
     console.log('👤 Creating user in Auth emulator...');
     
     // The user ID from your app logs
-    const targetUserId = 'agJ4ZzV9xZdqcZpyKCVZtDqeKFFJ';
+    const targetUserId = 'LoU5UwYVao2TgmSTKzNqNENkjwRe';
     console.log('🎯 Target User ID:', targetUserId);
     
     // Check if user already exists
@@ -34,7 +34,7 @@ const createUserInAuth = async () => {
     console.log('\n2️⃣ Creating user in Auth emulator...');
     const userRecord = await auth.createUser({
       uid: targetUserId, // Use the specific UID
-      email: 'anonymous@example.com',
+      email: 'anonymous1@example.com',
       displayName: 'Anonymous User',
       emailVerified: true
     });

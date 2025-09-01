@@ -14,8 +14,9 @@ export const spinWheel = functions.https.onCall(async (data: any, context: any) 
       console.log('❌ No auth context found');
     }
     console.log('🔍 Data:', data.auth);
+    console.log('🔍 Data:', data.clientRequestId);
     const userId = data?.auth?.uid;
-    const clientRequestId = data?.clientRequestId || null;
+    const clientRequestId = userId + Date.now() || null;
 
     // Check cooldown period (5 minutes)
     const cooldownMinutes = data?.cooldownMinutes || 1;

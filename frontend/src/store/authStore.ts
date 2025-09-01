@@ -10,7 +10,7 @@ interface AuthStore {
   initializeAuth: () => () => void;
 }
 
-// Mock user data for development fallback
+// Mock user data for fallback
 const mockUser = {
   uid: 'mock-user-123',
   email: 'mock@example.com',
@@ -114,7 +114,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             //   } catch (profileError) {
             //     console.warn('⚠️ Failed to update user profile:', profileError);
             //   }
-            // }, 200);
+            // }, 3000);
             
             set({ user: userCredential.user, isAuthenticated: true, loading: false });
 
@@ -131,7 +131,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             loading: false
           });
         }
-      }, 100); // 1 second delay
+      }, 10000); // 1 second delay
 
     } catch (firebaseError) {
       console.warn('⚠️ Firebase auth initialization failed, using mock auth:', firebaseError);

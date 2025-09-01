@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { View, Dimensions } from 'react-native';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
@@ -8,6 +8,7 @@ import Animated, {
   runOnJS
 } from 'react-native-reanimated';
 import Svg, { Circle, Text as SvgText, G, Path, Polygon } from 'react-native-svg';
+import { wheelStyles } from '../styles';
 
 const { width } = Dimensions.get('window');
 const WHEEL_SIZE = width * 0.9;
@@ -197,9 +198,9 @@ export const Wheel = React.forwardRef<any, WheelProps>(({ segments, isSpinning, 
   });
 
   return (
-    <View style={styles.container}>
+    <View style={wheelStyles.container}>
       <Animated.View
-        style={[styles.wheel, animatedStyle]}
+        style={[wheelStyles.wheel, animatedStyle]}
       >
         <Svg width={WHEEL_SIZE} height={WHEEL_SIZE}>
           {segments.map(renderSegment)}
@@ -216,7 +217,7 @@ export const Wheel = React.forwardRef<any, WheelProps>(({ segments, isSpinning, 
       </Animated.View>
       
       {/* Static pointer that doesn't rotate with the wheel */}
-      <View style={styles.pointerContainer}>
+      <View style={wheelStyles.pointerContainer}>
         <Svg width={WHEEL_SIZE} height={WHEEL_SIZE}>
           {renderPointer()}
         </Svg>
@@ -225,23 +226,4 @@ export const Wheel = React.forwardRef<any, WheelProps>(({ segments, isSpinning, 
   );
 });
 
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  wheel: {
-    width: WHEEL_SIZE,
-    height: WHEEL_SIZE,
-  },
-  pointerContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+

@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   FlatList,
   TouchableOpacity,
   RefreshControl,
   SafeAreaView,
   Alert,
 } from 'react-native';
+import { historyScreenStyles } from '../styles';
 import { useAuthStore } from '../store/authStore';
 import { functions } from '../../firebase.config';
 
@@ -154,40 +154,40 @@ export const HistoryScreen: React.FC = () => {
   };
 
   const renderSpinItem = ({ item }: { item: SpinHistory }) => (
-    <View style={styles.spinItem}>
-      <View style={styles.spinHeader}>
-        <Text style={styles.spinLabel}>{item.label}</Text>
-        <Text style={styles.spinIcon}>
+    <View style={historyScreenStyles.spinItem}>
+      <View style={historyScreenStyles.spinHeader}>
+        <Text style={historyScreenStyles.spinLabel}>{item.label}</Text>
+        <Text style={historyScreenStyles.spinIcon}>
           {getPrizeIcon(item.prize.type)}
         </Text>
       </View>
-      <View style={styles.spinDetails}>
-        <Text style={styles.spinAmount}>
+      <View style={historyScreenStyles.spinDetails}>
+        <Text style={historyScreenStyles.spinAmount}>
           {item.prize.amount}
           {item.prize.type === 'coins' && ' Coins'}
           {item.prize.type === 'bonus' && 'x Multiplier'}
         </Text>
-        <Text style={styles.spinDate}>{formatDate(item.timestamp)}</Text>
+        <Text style={historyScreenStyles.spinDate}>{formatDate(item.timestamp)}</Text>
       </View>
     </View>
   );
 
   const renderEmptyState = () => (
-    <View style={styles.emptyState}>
+    <View style={historyScreenStyles.emptyState}>
       {error ? (
         <>
-          <Text style={styles.emptyStateText}>Unable to load history</Text>
-          <Text style={styles.emptyStateSubtext}>
+          <Text style={historyScreenStyles.emptyStateText}>Unable to load history</Text>
+          <Text style={historyScreenStyles.emptyStateSubtext}>
             {error}
           </Text>
-          <TouchableOpacity style={styles.retryButton} onPress={() => fetchHistory(true)}>
-            <Text style={styles.retryButtonText}>Retry</Text>
+          <TouchableOpacity style={historyScreenStyles.retryButton} onPress={() => fetchHistory(true)}>
+            <Text style={historyScreenStyles.retryButtonText}>Retry</Text>
           </TouchableOpacity>
         </>
       ) : (
         <>
-          <Text style={styles.emptyStateText}>No spins yet</Text>
-          <Text style={styles.emptyStateSubtext}>
+          <Text style={historyScreenStyles.emptyStateText}>No spins yet</Text>
+          <Text style={historyScreenStyles.emptyStateSubtext}>
             Start spinning to see your history here!
           </Text>
         </>
@@ -196,14 +196,14 @@ export const HistoryScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Spin History</Text>
-        <Text style={styles.subtitle}>
+    <SafeAreaView style={historyScreenStyles.container}>
+      <View style={historyScreenStyles.header}>
+        <Text style={historyScreenStyles.title}>Spin History</Text>
+        <Text style={historyScreenStyles.subtitle}>
           Your past {spins.length} spins
         </Text>
         {user && (
-          <Text style={styles.userInfo}>
+          <Text style={historyScreenStyles.userInfo}>
             User: {user.uid.substring(0, 8)}... ({user.isAnonymous ? 'Anonymous' : 'Authenticated'})
           </Text>
         )}
@@ -213,7 +213,7 @@ export const HistoryScreen: React.FC = () => {
         data={spins}
         renderItem={renderSpinItem}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContainer}
+        contentContainerStyle={historyScreenStyles.listContainer}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -222,8 +222,8 @@ export const HistoryScreen: React.FC = () => {
         ListEmptyComponent={renderEmptyState}
         ListFooterComponent={
           loading && hasMore ? (
-            <View style={styles.loadingFooter}>
-              <Text style={styles.loadingText}>Loading more...</Text>
+            <View style={historyScreenStyles.loadingFooter}>
+              <Text style={historyScreenStyles.loadingText}>Loading more...</Text>
             </View>
           ) : null
         }
@@ -232,119 +232,4 @@ export const HistoryScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0F172A', // Navy background
-  },
-  header: {
-    padding: 20,
-    backgroundColor: '#1E293B', // Dark slate background
-    borderBottomWidth: 1,
-    borderBottomColor: '#334155', // Dark border
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#F8FAFC', // Light text
-    marginBottom: 5,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#94A3B8', // Light gray text
-    textAlign: 'center',
-  },
-  userInfo: {
-    fontSize: 12,
-    color: '#64748B', // Muted gray text
-    textAlign: 'center',
-    marginTop: 5,
-    fontFamily: 'monospace',
-  },
-  listContainer: {
-    padding: 20,
-  },
-  spinItem: {
-    backgroundColor: '#1E293B', // Dark slate background
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    borderWidth: 1,
-    borderColor: '#334155', // Dark border
-  },
-  spinHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  spinLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#F8FAFC', // Light text
-    flex: 1,
-  },
-  spinIcon: {
-    fontSize: 20,
-  },
-  spinDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  spinAmount: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#4ADE80', // Green accent
-  },
-  spinDate: {
-    fontSize: 12,
-    color: '#94A3B8', // Light gray text
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 60,
-  },
-  emptyStateText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#94A3B8', // Light gray text
-    marginBottom: 8,
-  },
-  emptyStateSubtext: {
-    fontSize: 14,
-    color: '#64748B', // Muted gray text
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  retryButton: {
-    backgroundColor: '#3B82F6', // Blue button
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  loadingFooter: {
-    paddingVertical: 20,
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: 14,
-    color: '#94A3B8', // Light gray text
-  },
-});
+
