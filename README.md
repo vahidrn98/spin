@@ -55,6 +55,31 @@ Wheel/
 - Performance-critical game mechanics
 - Future extensibility for more complex animations
 
+### **Why Simple Data Fetching (No React Query)?**
+
+**Simple data fetching with Zustand and Firebase** was chosen over React Query for several reasons:
+
+- **🚀 Simpler Architecture**: Fewer dependencies, less complexity, easier to understand and maintain
+- **📦 Smaller Bundle Size**: No additional library overhead, keeping the app lightweight
+- **🎯 Direct Control**: Full control over data flow, caching, and error handling
+- **🔥 Firebase Integration**: Firebase SDK already provides excellent caching and offline support
+- **⚡ Performance**: No unnecessary abstractions for simple data requirements
+- **🔧 Over-Engineering Prevention**: Avoids adding complexity for features not needed
+
+**Perfect for this app because:**
+- Simple data requirements (wheel config, spin history, user auth)
+- Firebase handles most caching and offline scenarios
+- Limited number of API calls with straightforward patterns
+- Focus on game mechanics rather than complex data synchronization
+- Small app scope doesn't justify the overhead of React Query
+
+**When to reconsider React Query:**
+- Adding complex data relationships (user profiles, leaderboards)
+- Implementing real-time updates beyond Firebase capabilities
+- Building offline-first functionality with complex sync logic
+- Integrating multiple data sources (APIs, local storage, etc.)
+- Needing advanced error handling and retry strategies
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -242,6 +267,71 @@ import { wheelScreenStyles } from '../styles';
 </View>
 ```
 
+## ♿ Accessibility Features
+
+The app includes comprehensive **screen reader support** and accessibility features to ensure it's usable by everyone:
+
+### **Screen Reader Support**
+- **🎯 Descriptive Labels**: All interactive elements have clear, descriptive accessibility labels
+- **💡 Helpful Hints**: Contextual hints guide users on how to interact with elements
+- **🎮 Proper Roles**: Elements are assigned appropriate accessibility roles (button, image, timer, etc.)
+- **📱 Live Updates**: Dynamic content updates are announced to screen readers
+
+### **Key Accessibility Features**
+
+#### **Wheel Component**
+```typescript
+<View 
+  accessible={true}
+  accessibilityLabel={`Spin wheel with ${segments.length} prize segments`}
+  accessibilityHint="The wheel will spin when you tap the spin button"
+  accessibilityRole="image"
+>
+```
+
+#### **Spin Button**
+```typescript
+<TouchableOpacity
+  accessible={true}
+  accessibilityLabel={isSpinning ? "Wheel is spinning" : "Spin the wheel button"}
+  accessibilityHint="Double tap to spin the wheel and win prizes"
+  accessibilityRole="button"
+  accessibilityState={{ disabled: !canSpin }}
+>
+```
+
+#### **Reward Popup**
+```typescript
+<Modal
+  accessible={true}
+  accessibilityLabel="Reward popup"
+  accessibilityHint="Shows your prize after spinning the wheel"
+>
+```
+
+#### **Cooldown Timer**
+```typescript
+<View 
+  accessible={true}
+  accessibilityLabel="Cooldown timer"
+  accessibilityRole="timer"
+  accessibilityHint="Shows time remaining until next spin is available"
+>
+```
+
+### **Accessibility Benefits**
+- **👁️ Screen Reader Compatible**: Works with VoiceOver (iOS) and TalkBack (Android)
+- **🎯 Clear Navigation**: Logical focus order and descriptive labels
+- **📊 Context Awareness**: Users understand their current position and available actions
+- **⚡ Dynamic Updates**: Real-time announcements for timer changes and game events
+- **🎮 Inclusive Gaming**: Makes the spin wheel game accessible to users with visual impairments
+
+### **Testing Accessibility**
+- **iOS**: Enable VoiceOver in Settings > Accessibility > VoiceOver
+- **Android**: Enable TalkBack in Settings > Accessibility > TalkBack
+- **Web**: Use browser developer tools to test accessibility tree
+- **Automated**: Consider using tools like axe-core for automated accessibility testing
+
 ## 🧪 Testing
 
 ### Firebase Functions Testing
@@ -386,6 +476,10 @@ The app implements several mechanisms to ensure fair gameplay:
 #### **Chosen: No Styling Library (e.g., nativewind) Installed**
 - **✅ Pros**: Full control over styles, no extra dependencies, smaller bundle size, easier debugging
 - **❌ Cons**: More manual styling, less utility class convenience, potentially more verbose code
+
+#### **Chosen: Simple Data Fetching (No React Query)**
+- **✅ Pros**: Simpler architecture, smaller bundle size, direct control, Firebase handles caching, no over-engineering
+- **❌ Cons**: Manual caching implementation, no built-in background refetching, more manual error handling
 
 ### **Performance Trade-offs**
 

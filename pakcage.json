@@ -1,9 +1,0 @@
-{
-  "scripts": {
-    "dev:firebase": "cd firebase && firebase emulators:start",
-    "dev:mobile": "cd frontend && expo start",
-    "build:functions": "cd firebase/functions && npm run build",
-    "deploy": "cd firebase && firebase deploy",
-    "seed": "cd firebase && node seed.js"
-  }
-}

@@ -57,19 +57,19 @@ export const Wheel = React.forwardRef<any, WheelProps>(({ segments, isSpinning, 
     spinWheel: (targetSegmentId: number) => {
       const targetSegmentIndex = segments.findIndex(seg => seg.id === targetSegmentId);
       
-      console.log('🎯 Wheel spin calculation:', {
-        targetSegmentId,
-        targetSegmentIndex,
-        atTopIndex,
-        segmentLabel: segments[targetSegmentIndex]?.label
-      });
+      // console.log('🎯 Wheel spin calculation:', {
+      //   targetSegmentId,
+      //   targetSegmentIndex,
+      //   atTopIndex,
+      //   segmentLabel: segments[targetSegmentIndex]?.label
+      // });
       
       // Calculate rotation using the new formula: 5 * 360 + abs(atTopIndex - targetIndex) * 45
       const baseRotations = 5 * 360; // 5 full rotations
       const segmentDifference = segments.length - Math.abs(atTopIndex - targetSegmentIndex);
-      console.log('🎲 Segment difference:', segmentDifference);
-      console.log('🎲 targetSegmentIndex:', targetSegmentIndex);
-      console.log('🎲 atTopIndex:', atTopIndex);
+      // console.log('🎲 Segment difference:', segmentDifference);
+      // console.log('🎲 targetSegmentIndex:', targetSegmentIndex);
+      // console.log('🎲 atTopIndex:', atTopIndex);
       const additionalRotation = segmentDifference * 45; // 45 degrees per segment difference
       const totalRotation = baseRotations + additionalRotation;
       
@@ -198,9 +198,18 @@ export const Wheel = React.forwardRef<any, WheelProps>(({ segments, isSpinning, 
   });
 
   return (
-    <View style={wheelStyles.container}>
+    <View 
+      style={wheelStyles.container}
+      accessible={true}
+      accessibilityLabel={`Spin wheel with ${segments.length} prize segments`}
+      accessibilityHint="The wheel will spin when you tap the spin button"
+      accessibilityRole="image"
+    >
       <Animated.View
         style={[wheelStyles.wheel, animatedStyle]}
+        accessible={true}
+        accessibilityLabel="Rotating wheel segments"
+        accessibilityRole="image"
       >
         <Svg width={WHEEL_SIZE} height={WHEEL_SIZE}>
           {segments.map(renderSegment)}
@@ -217,7 +226,13 @@ export const Wheel = React.forwardRef<any, WheelProps>(({ segments, isSpinning, 
       </Animated.View>
       
       {/* Static pointer that doesn't rotate with the wheel */}
-      <View style={wheelStyles.pointerContainer}>
+      <View 
+        style={wheelStyles.pointerContainer}
+        accessible={true}
+        accessibilityLabel="Wheel pointer indicator"
+        accessibilityHint="This shows which segment you will win"
+        accessibilityRole="image"
+      >
         <Svg width={WHEEL_SIZE} height={WHEEL_SIZE}>
           {renderPointer()}
         </Svg>

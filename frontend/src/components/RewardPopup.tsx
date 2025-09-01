@@ -106,33 +106,69 @@ export const RewardPopup: React.FC<RewardPopupProps> = ({
       transparent
       animationType="none"
       onRequestClose={onClose}
+      accessible={true}
+      accessibilityLabel="Reward popup"
+      accessibilityHint="Shows your prize after spinning the wheel"
     >
-              <Animated.View
-          style={[
-            rewardPopupStyles.overlay,
-            {
-              opacity: opacityAnim,
-            },
-          ]}
-        >
-          <Animated.View
+                        <Animated.View
             style={[
-              rewardPopupStyles.popup,
+              rewardPopupStyles.overlay,
               {
-                transform: [{ scale: scaleAnim }],
+                opacity: opacityAnim,
               },
             ]}
+            accessible={true}
+            accessibilityLabel="Reward popup overlay"
           >
-            <View style={rewardPopupStyles.header}>
-              <Text style={rewardPopupStyles.congratsText}>🎉 Congratulations! 🎉</Text>
+            <Animated.View
+              style={[
+                rewardPopupStyles.popup,
+                {
+                  transform: [{ scale: scaleAnim }],
+                },
+              ]}
+              accessible={true}
+              accessibilityLabel="Reward popup content"
+            >
+            <View 
+              style={rewardPopupStyles.header}
+              accessible={true}
+              accessibilityLabel="Congratulations header"
+            >
+              <Text 
+                style={rewardPopupStyles.congratsText}
+                accessible={true}
+                accessibilityLabel="Congratulations! You won a prize!"
+              >
+                🎉 Congratulations! 🎉
+              </Text>
             </View>
 
-            <View style={rewardPopupStyles.prizeContainer}>
-              <Text style={rewardPopupStyles.prizeIcon}>
+            <View 
+              style={rewardPopupStyles.prizeContainer}
+              accessible={true}
+              accessibilityLabel="Prize details"
+              accessibilityRole="summary"
+            >
+              <Text 
+                style={rewardPopupStyles.prizeIcon}
+                accessible={true}
+                accessibilityLabel={`Prize icon: ${getPrizeIcon(segment.prize.type)}`}
+              >
                 {getPrizeIcon(segment.prize.type)}
               </Text>
-              <Text style={rewardPopupStyles.prizeLabel}>{segment.label}</Text>
-              <Text style={rewardPopupStyles.prizeDescription}>
+              <Text 
+                style={rewardPopupStyles.prizeLabel}
+                accessible={true}
+                accessibilityLabel={`Prize segment: ${segment.label}`}
+              >
+                {segment.label}
+              </Text>
+              <Text 
+                style={rewardPopupStyles.prizeDescription}
+                accessible={true}
+                accessibilityLabel={`Prize description: ${segment.prize.description}`}
+              >
                 {segment.prize.description}
               </Text>
               <Text
@@ -140,6 +176,8 @@ export const RewardPopup: React.FC<RewardPopupProps> = ({
                   rewardPopupStyles.prizeAmount,
                   { color: getPrizeColor(segment.prize.type) },
                 ]}
+                accessible={true}
+                accessibilityLabel={`Prize amount: ${segment.prize.amount}${segment.prize.type === 'coins' ? ' Coins' : segment.prize.type === 'bonus' ? 'x Multiplier' : ''}`}
               >
                 {segment.prize.amount}
                 {segment.prize.type === 'coins' && ' Coins'}
@@ -147,7 +185,14 @@ export const RewardPopup: React.FC<RewardPopupProps> = ({
               </Text>
             </View>
 
-            <TouchableOpacity style={rewardPopupStyles.closeButton} onPress={onClose}>
+            <TouchableOpacity 
+              style={rewardPopupStyles.closeButton} 
+              onPress={onClose}
+              accessible={true}
+              accessibilityLabel="Continue button"
+              accessibilityHint="Double tap to close the reward popup and continue"
+              accessibilityRole="button"
+            >
               <Text style={rewardPopupStyles.closeButtonText}>Continue</Text>
             </TouchableOpacity>
           </Animated.View>

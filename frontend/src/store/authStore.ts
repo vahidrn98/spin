@@ -34,19 +34,19 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     try {
       set({ loading: true });
 
-      console.log('🔐 Attempting Firebase anonymous sign in...');
+      // console.log('🔐 Attempting Firebase anonymous sign in...');
 
       // Try Firebase authentication first
       try {
         const userCredential = await auth().signInAnonymously();
-        console.log('✅ Firebase authentication successful:', userCredential.user.uid);
+        // console.log('✅ Firebase authentication successful:', userCredential.user.uid);
         
         // Update the user profile with display name
         try {
           await userCredential.user.updateProfile({
             displayName: "Anonymous User"
           });
-          console.log('✅ User profile updated with display name');
+          // console.log('✅ User profile updated with display name');
         } catch (profileError) {
           console.warn('⚠️ Failed to update user profile:', profileError);
         }
@@ -69,18 +69,18 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   signOut: async () => {
     try {
-      console.log('🔐 Attempting Firebase sign out...');
+      // console.log('🔐 Attempting Firebase sign out...');
 
       // Try Firebase sign out first
       try {
         await auth().signOut();
-        console.log('✅ Firebase sign out successful');
+        // console.log('✅ Firebase sign out successful');
         set({ user: null, isAuthenticated: false });
       } catch (firebaseError) {
-        console.warn('⚠️ Firebase sign out failed, using mock sign out:', firebaseError);
+        // console.warn('⚠️ Firebase sign out failed, using mock sign out:', firebaseError);
 
         // Fallback to mock sign out
-        console.log('🎭 Mock sign out');
+        // console.log('🎭 Mock sign out');
         set({ user: null, isAuthenticated: false });
       }
 
@@ -90,7 +90,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   initializeAuth: () => {
-    console.log('🔐 Initializing Firebase authentication...');
+    // console.log('🔐 Initializing Firebase authentication...');
 
     // Try Firebase auth state listener first
     try {
@@ -99,7 +99,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                   // Try to automatically sign in anonymously
           try {
             const userCredential = await auth().signInAnonymously();
-            console.log('✅ Automatic sign in successful:', userCredential.user.uid);
+            // console.log('✅ Automatic sign in successful:', userCredential.user.uid);
             
             // Update the user profile with display name
             // timer 3 seconds
@@ -121,10 +121,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           // The auth state listener will be called again with the new user
           // so we don't need to set the state here
         } catch (autoSignInError: any) {
-          console.warn('⚠️ Automatic sign in failed, using mock auth:', autoSignInError);
+          // console.warn('⚠️ Automatic sign in failed, using mock auth:', autoSignInError);
 
           // Fallback to mock authentication
-          console.log('🎭 Using mock authentication for auto sign in');
+          // console.log('🎭 Using mock authentication for auto sign in');
           set({
             user: mockUser,
             isAuthenticated: true,
@@ -134,10 +134,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       }, 10000); // 1 second delay
 
     } catch (firebaseError) {
-      console.warn('⚠️ Firebase auth initialization failed, using mock auth:', firebaseError);
+      // console.warn('⚠️ Firebase auth initialization failed, using mock auth:', firebaseError);
 
       // Fallback to mock authentication
-      console.log('🎭 Initializing mock authentication');
+      // console.log('🎭 Initializing mock authentication');
 
       // Simulate a brief loading period
       setTimeout(() => {
@@ -150,7 +150,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
       // Return a mock unsubscribe function
       const mockUnsubscribe = () => {
-        console.log('🎭 Mock auth unsubscribe');
+        // console.log('🎭 Mock auth unsubscribe');
       };
 
       return mockUnsubscribe;

@@ -46,9 +46,28 @@ export const CooldownTimer: React.FC<CooldownTimerProps> = ({
   }
 
   return (
-    <View style={cooldownTimerStyles.container}>
-      <Text style={cooldownTimerStyles.label}>Next spin available in:</Text>
-      <Text style={cooldownTimerStyles.timer}>{timeRemaining}</Text>
+    <View 
+      style={cooldownTimerStyles.container}
+      accessible={true}
+      accessibilityLabel="Cooldown timer"
+      accessibilityRole="timer"
+      accessibilityHint="Shows time remaining until next spin is available"
+    >
+      <Text 
+        style={cooldownTimerStyles.label}
+        accessible={true}
+        accessibilityLabel="Next spin available in"
+      >
+        Next spin available in:
+      </Text>
+      <Text 
+        style={cooldownTimerStyles.timer}
+        accessible={true}
+        accessibilityLabel={`Time remaining: ${timeRemaining}`}
+        accessibilityLiveRegion="polite"
+      >
+        {timeRemaining}
+      </Text>
     </View>
   );
 };

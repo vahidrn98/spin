@@ -65,7 +65,7 @@ export const WheelScreen: React.FC = () => {
       
       // Call Firebase Function
       const spinWheel = functions().httpsCallable('spinWheel');
-      console.log('🔍 Spin wheel function called');
+      // console.log('🔍 Spin wheel function called');
       // console.log('🔍 User:', user);
       const result = await spinWheel({
         clientRequestId: `spin_${(Date.now())}`,
@@ -74,7 +74,7 @@ export const WheelScreen: React.FC = () => {
 
 
       const data = result.data as any;
-      console.log('🔍 Data:', data);
+      // console.log('🔍 Data:', data);
 
       // console.log('🔍 Data after spin:', data);
       if (data.success) {
@@ -83,7 +83,7 @@ export const WheelScreen: React.FC = () => {
         
         // Calculate next allowed time
         const nextTime = new Date();
-        console.log('🔍 Next time:', data.cooldownMinutes);
+        // console.log('🔍 Next time:', data.cooldownMinutes);
         nextTime.setMinutes(nextTime.getMinutes() + data.cooldownMinutes);
         setNextAllowedAt(nextTime);
         
@@ -97,7 +97,7 @@ export const WheelScreen: React.FC = () => {
       
       
     } catch (error: any) {
-      console.log('Spin error:', error);
+      // console.log('Spin error:', error);
       Alert.alert('Error', error.message);
       
       if (error.code === 'functions/failed-precondition') {
@@ -105,7 +105,7 @@ export const WheelScreen: React.FC = () => {
       } else if (error.code === 'functions/unauthenticated') {
         Alert.alert('Authentication Required', 'Please sign in to spin the wheel.');
       } else {
-        console.log('Error', 'Something went wrong. Please try again.');
+        // console.log('Error', 'Something went wrong. Please try again.');
       }
     } finally {
       setIsSpinning(false);
@@ -142,7 +142,12 @@ export const WheelScreen: React.FC = () => {
   if (!wheelConfig) {
     return (
       <SafeAreaView style={wheelScreenStyles.container}>
-        <View style={wheelScreenStyles.loadingContainer}>
+        <View 
+          style={wheelScreenStyles.loadingContainer}
+          accessible={true}
+          accessibilityLabel="Loading wheel configuration"
+          accessibilityRole="progressbar"
+        >
           <ActivityIndicator size="large" color="#4ADE80" />
         </View>
       </SafeAreaView>
@@ -152,14 +157,28 @@ export const WheelScreen: React.FC = () => {
   return (
     <SafeAreaView style={wheelScreenStyles.container}>
       <ScrollView contentContainerStyle={wheelScreenStyles.scrollContent}>
-        <View style={wheelScreenStyles.header}>
-          <Text style={wheelScreenStyles.title}>Spin & Win</Text>
+        <View 
+          style={wheelScreenStyles.header}
+          accessible={true}
+          accessibilityLabel="Game header"
+        >
+          <Text 
+            style={wheelScreenStyles.title}
+            accessible={true}
+            accessibilityLabel="Spin and Win game title"
+          >
+            Spin & Win
+          </Text>
           {/* {user && (
             <Text style={wheelScreenStyles.userInfo}>Welcome, {user.email}</Text>
           )} */}
         </View>
 
-        <View style={wheelScreenStyles.wheelContainer}>
+        <View 
+          style={wheelScreenStyles.wheelContainer}
+          accessible={true}
+          accessibilityLabel="Wheel game area"
+        >
           <Wheel
             ref={wheelRef}
             segments={wheelConfig.segments}
@@ -184,6 +203,11 @@ export const WheelScreen: React.FC = () => {
           ]}
           onPress={handleSpin}
           disabled={!canSpin}
+          accessible={true}
+          accessibilityLabel={isSpinning ? "Wheel is spinning" : "Spin the wheel button"}
+          accessibilityHint="Double tap to spin the wheel and win prizes"
+          accessibilityRole="button"
+          accessibilityState={{ disabled: !canSpin }}
         >
           <Text style={wheelScreenStyles.spinButtonText}>
             {isSpinning ? 'Spinning...' : 'SPIN THE WHEEL!'}
@@ -191,23 +215,64 @@ export const WheelScreen: React.FC = () => {
         </TouchableOpacity>
 
         {lastSpinResult && (
-          <View style={wheelScreenStyles.lastSpinContainer}>
-            <View style={wheelScreenStyles.lastSpinHeader}>
-              <Text style={wheelScreenStyles.lastSpinIcon}>🎉</Text>
-              <Text style={wheelScreenStyles.lastSpinTitle}>Last Spin Result</Text>
+          <View 
+            style={wheelScreenStyles.lastSpinContainer}
+            accessible={true}
+            accessibilityLabel="Last spin result"
+            accessibilityRole="summary"
+          >
+            <View 
+              style={wheelScreenStyles.lastSpinHeader}
+              accessible={true}
+              accessibilityLabel="Last spin result header"
+            >
+              <Text 
+                style={wheelScreenStyles.lastSpinIcon}
+                accessible={true}
+                accessibilityLabel="Celebration icon"
+              >
+                🎉
+              </Text>
+              <Text 
+                style={wheelScreenStyles.lastSpinTitle}
+                accessible={true}
+                accessibilityLabel="Last spin result title"
+              >
+                Last Spin Result
+              </Text>
             </View>
-            <View style={wheelScreenStyles.lastSpinContent}>
-              <Text style={wheelScreenStyles.lastSpinMessage}>
+            <View 
+              style={wheelScreenStyles.lastSpinContent}
+              accessible={true}
+              accessibilityLabel="Last spin details"
+            >
+              <Text 
+                style={wheelScreenStyles.lastSpinMessage}
+                accessible={true}
+                accessibilityLabel={`Last spin message: ${lastSpinResult.message}`}
+              >
                 {lastSpinResult.message}
               </Text>
-              <View style={wheelScreenStyles.lastSpinDetails}>
-                <View style={wheelScreenStyles.lastSpinDetail}>
+              <View 
+                style={wheelScreenStyles.lastSpinDetails}
+                accessible={true}
+                accessibilityLabel="Prize details"
+              >
+                <View 
+                  style={wheelScreenStyles.lastSpinDetail}
+                  accessible={true}
+                  accessibilityLabel={`Prize segment: ${lastSpinResult.segment.label}`}
+                >
                   <Text style={wheelScreenStyles.lastSpinDetailLabel}>Segment</Text>
                   <Text style={wheelScreenStyles.lastSpinDetailValue}>
                     {lastSpinResult.segment.label}
                   </Text>
                 </View>
-                <View style={wheelScreenStyles.lastSpinDetail}>
+                <View 
+                  style={wheelScreenStyles.lastSpinDetail}
+                  accessible={true}
+                  accessibilityLabel={`Prize description: ${lastSpinResult.segment.prize.description}`}
+                >
                   <Text style={wheelScreenStyles.lastSpinDetailLabel}>Prize</Text>
                   <Text style={wheelScreenStyles.lastSpinDetailValue}>
                     {lastSpinResult.segment.prize.description}
