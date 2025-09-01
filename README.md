@@ -94,7 +94,7 @@ Wheel/
 ### 1. Clone and Setup
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/vahidrn98/spin
 cd Wheel
 ```
 
@@ -113,7 +113,7 @@ firebase login
 firebase init
 
 # Start Firebase emulators
-npm run start-emulators
+firebase emulators:start
 ```
 
 **Firebase Emulators:**
@@ -131,7 +131,7 @@ cd frontend
 npm install
 
 # Start the development server
-npm start
+npx expo run:android
 ```
 
 **Expo Development:**
@@ -151,12 +151,6 @@ npm install
 
 # Build TypeScript
 npm run build
-
-# Deploy functions
-firebase deploy --only functions
-
-# Test functions locally
-npm run serve
 ```
 
 ### React Native Development
@@ -512,19 +506,3 @@ The app ensures data consistency through idempotent operations:
 - **🔄 Automatic Retry**: Network failures trigger automatic retry mechanisms
 - **📱 User Feedback**: Clear error messages guide users through issues
 - **🔧 Fallback Systems**: Mock authentication and data when Firebase is unavailable
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## 📄 License
-
-[Add your license information here]
-
----
-
-**Happy Spinning! 🎡**
