@@ -20,7 +20,7 @@ const seedData = async () => {
         {
           id: 1,
           label: "🎁 Prize A",
-          color: "#FF6B6B",
+          color: "#4ADE80", // Green
           weight: 10,
           prize: {
             type: "coins",
@@ -31,7 +31,7 @@ const seedData = async () => {
         {
           id: 2,
           label: "🏆 Prize B", 
-          color: "#4ECDC4",
+          color: "#06B6D4", // Cyan
           weight: 15,
           prize: {
             type: "coins",
@@ -42,7 +42,7 @@ const seedData = async () => {
         {
           id: 3,
           label: "💎 Rare Prize",
-          color: "#45B7D1",
+          color: "#8B5CF6", // Purple
           weight: 5,
           prize: {
             type: "special",
@@ -53,7 +53,7 @@ const seedData = async () => {
         {
           id: 4,
           label: "🎯 Prize C",
-          color: "#96CEB4",
+          color: "#F59E0B", // Amber
           weight: 20,
           prize: {
             type: "coins", 
@@ -64,7 +64,7 @@ const seedData = async () => {
         {
           id: 5,
           label: "⭐ Bonus",
-          color: "#FFEAA7",
+          color: "#EC4899", // Pink
           weight: 15,
           prize: {
             type: "bonus",
@@ -75,7 +75,7 @@ const seedData = async () => {
         {
           id: 6,
           label: "🎈 Prize D",
-          color: "#DDA0DD",
+          color: "#10B981", // Emerald
           weight: 20,
           prize: {
             type: "coins",
@@ -86,7 +86,7 @@ const seedData = async () => {
         {
           id: 7,
           label: "🎊 Prize E",
-          color: "#98D8C8",
+          color: "#3B82F6", // Blue
           weight: 10,
           prize: {
             type: "coins",
@@ -97,7 +97,7 @@ const seedData = async () => {
         {
           id: 8,
           label: "🔥 Jackpot",
-          color: "#F7DC6F",
+          color: "#EF4444", // Red
           weight: 5,
           prize: {
             type: "jackpot",
@@ -107,7 +107,7 @@ const seedData = async () => {
         }
       ],
       totalWeight: 100,
-      cooldownMinutes: 5,
+      cooldownMinutes: 1,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       version: 1
     };

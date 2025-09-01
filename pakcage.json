@@ -4,6 +4,6 @@
     "dev:mobile": "cd frontend && expo start",
     "build:functions": "cd firebase/functions && npm run build",
     "deploy": "cd firebase && firebase deploy",
-    "seed": "cd firebase && node seeding.js"
+    "seed": "cd firebase && node seed.js"
   }
 }

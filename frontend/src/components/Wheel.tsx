@@ -65,12 +65,15 @@ export const Wheel = React.forwardRef<any, WheelProps>(({ segments, isSpinning, 
       
       // Calculate rotation using the new formula: 5 * 360 + abs(atTopIndex - targetIndex) * 45
       const baseRotations = 5 * 360; // 5 full rotations
-      const segmentDifference = Math.abs(segments.length - (atTopIndex+1 - targetSegmentIndex));
+      const segmentDifference = segments.length - Math.abs(atTopIndex - targetSegmentIndex);
+      console.log('🎲 Segment difference:', segmentDifference);
+      console.log('🎲 targetSegmentIndex:', targetSegmentIndex);
+      console.log('🎲 atTopIndex:', atTopIndex);
       const additionalRotation = segmentDifference * 45; // 45 degrees per segment difference
       const totalRotation = baseRotations + additionalRotation;
       
       // Calculate final rotation (clockwise is positive)
-      const finalRotation = currentRotation + totalRotation;
+      const finalRotation = totalRotation - 22.5;
       
       console.log('🎲 Final rotation calculation:', {
         atTopIndex,

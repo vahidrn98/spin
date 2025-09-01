@@ -18,7 +18,7 @@ export const spinWheel = functions.https.onCall(async (data: any, context: any) 
     const clientRequestId = data?.clientRequestId || null;
 
     // Check cooldown period (5 minutes)
-    const cooldownMinutes = 1;
+    const cooldownMinutes = data?.cooldownMinutes || 1;
     const lastSpinQuery = await db.collection('spins')
       .where('userId', '==', userId)
       .orderBy('timestamp', 'desc')
@@ -74,7 +74,7 @@ export const spinWheel = functions.https.onCall(async (data: any, context: any) 
       spinId: spinRef.id,
       segment: selectedSegment,
       message: `You won: ${selectedSegment.prize.description}`,
-      cooldownMinutes
+      cooldownMinutes: wheelConfig?.cooldownMinutes || 1
     };
 
   } catch (error) {

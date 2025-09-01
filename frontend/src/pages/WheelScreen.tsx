@@ -7,6 +7,7 @@ import {
   Alert,
   ScrollView,
   SafeAreaView,
+  ActivityIndicator,
 } from 'react-native';
 import { Wheel } from '../components/Wheel';
 import { RewardPopup } from '../components/RewardPopup';
@@ -141,7 +142,7 @@ export const WheelScreen: React.FC = () => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading ...</Text>
+          <ActivityIndicator size="large" color="#4ADE80" />
         </View>
       </SafeAreaView>
     );
