@@ -27,7 +27,7 @@ export const spinWheel = functions.https.onCall(async (data: any, context: any) 
 
     if (!lastSpinQuery.empty) {
       const lastSpin = lastSpinQuery.docs[0].data();
-      const lastSpinTime = lastSpin.timestamp.toDate();
+      const lastSpinTime = lastSpin.timestamp?.toDate?.() || new Date(lastSpin.timestamp);
       const now = new Date();
       const timeDiff = (now.getTime() - lastSpinTime.getTime()) / (1000 * 60); // minutes
 

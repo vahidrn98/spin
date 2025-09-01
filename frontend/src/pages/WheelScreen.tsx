@@ -11,7 +11,6 @@ import {
 import { Wheel } from '../components/Wheel';
 import { RewardPopup } from '../components/RewardPopup';
 import { CooldownTimer } from '../components/CooldownTimer';
-import { AuthTest } from '../components/AuthTest';
 import { useWheelStore } from '../store/wheelStore';
 import { useAuthStore } from '../store/authStore';
 import { functions } from '../../firebase.config';
@@ -62,62 +61,11 @@ export const WheelScreen: React.FC = () => {
     setIsSpinning(true);
 
     try {
-      // Mock spin functionality for now
-      // console.log('🎭 Using mock spin functionality');
       
-      // // Simulate network delay
-      // await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // // Randomly select a winning segment based on weights
-      // const totalWeight = wheelConfig.totalWeight;
-      // let randomValue = Math.random() * totalWeight;
-      // let winningSegment = wheelConfig.segments[0];
-      
-      // for (const segment of wheelConfig.segments) {
-      //   randomValue -= segment.weight;
-      //   if (randomValue <= 0) {
-      //     winningSegment = segment;
-      //     break;
-      //   }
-      // }
-      
-      // console.log('🎯 Selected winning segment:', {
-      //   id: winningSegment.id,
-      //   label: winningSegment.label,
-      //   index: wheelConfig.segments.findIndex(s => s.id === winningSegment.id)
-      // });
-      
-      // // Create mock result
-      // const mockResult = {
-      //   success: true,
-      //   segment: winningSegment,
-      //   message: `Congratulations! You won: ${winningSegment.prize.description}`,
-      //   cooldownMinutes: wheelConfig.cooldownMinutes,
-      //   timestamp: new Date().toISOString()
-      // };
-      
-      // console.log('🎰 Mock spin result:', mockResult);
-      
-      // setWinningSegment(winningSegment);
-      // // lastSpinResult will be set after the reward popup is closed
-      
-      // // Calculate next allowed time
-      // const nextTime = new Date();
-      // nextTime.setMinutes(nextTime.getMinutes() + mockResult.cooldownMinutes);
-      // setNextAllowedAt(nextTime);
-      
-      // // Trigger wheel animation
-      // if (wheelRef.current) {
-      //   console.log('🎲 Spinning wheel to segment ID:', winningSegment.id);
-      //   wheelRef.current.spinWheel(winningSegment.id);
-      // }
-      
-      // Firebase code (commented out for now)
-      
-             // Call Firebase Function
-       const spinWheel = functions().httpsCallable('spinWheel');
+      // Call Firebase Function
+      const spinWheel = functions().httpsCallable('spinWheel');
       console.log('🔍 Spin wheel function called');
-
+      // console.log('🔍 User:', user);
       const result = await spinWheel({
         clientRequestId: `spin_${Date.now()}`,
         userId: user?.uid, // For emulator testing
@@ -125,6 +73,7 @@ export const WheelScreen: React.FC = () => {
 
 
       const data = result.data as any;
+      console.log('🔍 Data:', data);
 
       // console.log('🔍 Data after spin:', data);
       if (data.success) {
@@ -192,7 +141,7 @@ export const WheelScreen: React.FC = () => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading wheel configuration...</Text>
+          <Text style={styles.loadingText}>Loading ...</Text>
         </View>
       </SafeAreaView>
     );

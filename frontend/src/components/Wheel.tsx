@@ -34,8 +34,11 @@ interface WheelProps {
 }
 
 export const Wheel = React.forwardRef<any, WheelProps>(({ segments, isSpinning, onSpinComplete, winningSegmentId }, ref) => {
-  const spinValue = useSharedValue(0);
-  const [currentRotation, setCurrentRotation] = useState(0);
+  // Set initial rotation to 22.5 degrees counter-clockwise (-22.5 degrees)
+  const INITIAL_ROTATION = -22.5;
+  const spinValue = useSharedValue(INITIAL_ROTATION);
+  const [currentRotation, setCurrentRotation] = useState(INITIAL_ROTATION);
+  const [atTopIndex, setAtTopIndex] = useState(0); // Track which segment is currently at the top
 
   const segmentAngle = 360 / segments.length;
 
@@ -52,37 +55,32 @@ export const Wheel = React.forwardRef<any, WheelProps>(({ segments, isSpinning, 
   React.useImperativeHandle(ref, () => ({
     spinWheel: (targetSegmentId: number) => {
       const targetSegmentIndex = segments.findIndex(seg => seg.id === targetSegmentId);
-      // Calculate the center angle of the target segment
-      const targetSegmentStart = targetSegmentIndex * segmentAngle;
-      const targetSegmentCenter = targetSegmentStart + (segmentAngle / 2);
       
       console.log('🎯 Wheel spin calculation:', {
         targetSegmentId,
         targetSegmentIndex,
-        targetSegmentStart,
-        targetSegmentCenter,
-        segmentAngle,
-        currentRotation,
+        atTopIndex,
         segmentLabel: segments[targetSegmentIndex]?.label
       });
       
-      // Calculate the final rotation to land on the target segment
-      // Add multiple full rotations for spinning effect
-      const fullRotations = 5; // Number of full rotations
-      // The wheel should land with the target segment at the top (where the pointer is)
-      // We need to rotate the wheel so that the target segment center moves to 0 degrees
-      const finalRotation = currentRotation + (fullRotations * 360) + targetSegmentCenter;
+      // Calculate rotation using the new formula: 5 * 360 + abs(atTopIndex - targetIndex) * 45
+      const baseRotations = 5 * 360; // 5 full rotations
+      const segmentDifference = Math.abs(segments.length - (atTopIndex+1 - targetSegmentIndex));
+      const additionalRotation = segmentDifference * 45; // 45 degrees per segment difference
+      const totalRotation = baseRotations + additionalRotation;
       
-      const finalRotationDegrees = finalRotation;
-      const segmentAtTop = getSegmentAtTop(finalRotationDegrees);
+      // Calculate final rotation (clockwise is positive)
+      const finalRotation = currentRotation + totalRotation;
       
       console.log('🎲 Final rotation calculation:', {
-        fullRotations,
-        targetSegmentCenter,
+        atTopIndex,
+        targetSegmentIndex,
+        segmentDifference,
+        baseRotations,
+        additionalRotation,
+        totalRotation,
         finalRotation,
-        finalRotationDegrees,
-        expectedSegment: segments[targetSegmentIndex]?.label,
-        actualSegmentAtTop: segmentAtTop?.label
+        expectedSegment: segments[targetSegmentIndex]?.label
       });
       
       spinValue.value = withTiming(
@@ -90,7 +88,8 @@ export const Wheel = React.forwardRef<any, WheelProps>(({ segments, isSpinning, 
         { duration: 3000 },
         (finished) => {
           if (finished) {
-            runOnJS(setCurrentRotation)(finalRotation % 360);
+            runOnJS(setCurrentRotation)(finalRotation);
+            runOnJS(setAtTopIndex)(targetSegmentIndex); // Update atTopIndex to targetIndex
             runOnJS(onSpinComplete)?.(segments[targetSegmentIndex]);
           }
         }
@@ -186,8 +185,8 @@ export const Wheel = React.forwardRef<any, WheelProps>(({ segments, isSpinning, 
   const animatedStyle = useAnimatedStyle(() => {
     const rotation = interpolate(
       spinValue.value,
-      [0, 360],
-      [0, 360]
+      [INITIAL_ROTATION, INITIAL_ROTATION + 360],
+      [INITIAL_ROTATION, INITIAL_ROTATION + 360]
     );
     return {
       transform: [{ rotate: `${rotation}deg` }]
