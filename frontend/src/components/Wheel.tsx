@@ -73,7 +73,7 @@ export const Wheel = React.forwardRef<any, WheelProps>(({ segments, isSpinning, 
       const totalRotation = baseRotations + additionalRotation;
       
       // Calculate final rotation (clockwise is positive)
-      const finalRotation = totalRotation - 22.5;
+      const finalRotation = currentRotation + totalRotation;
       
       console.log('🎲 Final rotation calculation:', {
         atTopIndex,
